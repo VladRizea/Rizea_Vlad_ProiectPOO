@@ -1,6 +1,10 @@
 #include <iostream>
 using namespace std;
 
+// Cele 3 obiecte se numesc: Vehicul, Roata si Navigatie si fac parte din domeniul autoturismelor
+// Fiecare obiect are cate o functie prorprie: Pentru vehicul este adaugata o revizie, pentru Roata este crescut numarul de ani iar pentru navigatie este instalata o noua voce.
+
+
 class Vehicul {
 public:
     const string serie;
@@ -131,7 +135,7 @@ public:
 string Roata::material_pneu = "Cauciuc";
 
 
-class GPS {
+class Navigatie {
 public:
     const string limba;
     static string tip_conectivitate;
@@ -169,13 +173,13 @@ public:
     }
 
 
-    GPS() : limba("Romana") {
+    Navigatie() : limba("Romana") {
         this->marca = "Google";
         this->numar_voci = 0;
         this->numele_vocilor = nullptr;
     }
 
-    GPS(string limba, string marca, int numar_voci, string* numele_vocilor) : limba(limba) {
+    Navigatie(string limba, string marca, int numar_voci, string* numele_vocilor) : limba(limba) {
         this->marca = marca;
         this->numar_voci = numar_voci;
         this->numele_vocilor = new string[numar_voci];
@@ -187,7 +191,7 @@ public:
     }
 
 
-    GPS(string marca, int numar_voci, string* numele_vocilor) : limba("Romana") {
+    Navigatie(string marca, int numar_voci, string* numele_vocilor) : limba("Romana") {
         this->marca = marca;
         this->numar_voci = numar_voci;
 
@@ -197,14 +201,14 @@ public:
         }
     }
 
-    ~GPS() {
+    ~Navigatie() {
         if (this->numele_vocilor != nullptr) {
             delete[] this->numele_vocilor;
         }
     }
 };
 
-string GPS::tip_conectivitate = "Satelit";
+string Navigatie::tip_conectivitate = "Satelit";
 
 int main() {
     Vehicul vehicul;
@@ -213,10 +217,10 @@ int main() {
     int ani_revizii_1[] = { 2005, 2006, 2007 };
     Vehicul vehicul1("2BZQN580", "Bmw", 200000, 3, ani_revizii_1);
     vehicul1.afisare();
-    Vehicul vehicul_2("Audi", 74000);
-    vehicul_2.afisare();
-    vehicul_2.adaugareRevizie(2023);
-    vehicul_2.afisare();
+    Vehicul vehicul2("Audi", 74000);
+    vehicul2.afisare();
+    vehicul2.adaugareRevizie(2023);
+    vehicul2.afisare();
 
     Roata roata;
     roata.afisare();
@@ -228,15 +232,15 @@ int main() {
     roata2.crestereVarstaUnAn();
     roata2.afisare();
 
-    GPS gps;
-    gps.afisare();
+    Navigatie navigatie;
+    navigatie.afisare();
     string nume_voci_1[] = { "Carmen", "Marius" };
-    GPS gps1("Italiana", "Garmin", 2, nume_voci_1);
-    gps1.afisare();
+    Navigatie navigatie1("Italiana", "Garmin", 2, nume_voci_1);
+    navigatie1.afisare();
     string nume_voci_2[] = { "Andrei", "Maria", "Doina"};
-    GPS gps2("Nokia", 3, nume_voci_2);
-    gps2.afisare();
-    gps2.instalareVoce("Elena");
-    gps2.afisare();
+    Navigatie navigatie2("Nokia", 3, nume_voci_2);
+    navigatie2.afisare();
+    navigatie2.instalareVoce("Elena");
+    navigatie2.afisare();
     return 0;
 }
