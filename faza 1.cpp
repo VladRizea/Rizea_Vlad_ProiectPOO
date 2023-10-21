@@ -1,21 +1,21 @@
 #include <iostream>
 using namespace std;
 
-// Cele 3 obiecte se numesc: Vehicul, Roata si Navigatie si fac parte din domeniul autoturismelor
-// Fiecare obiect are cate o functie prorprie: Pentru vehicul este adaugata o revizie, pentru Roata este crescut numarul de ani iar pentru navigatie este instalata o noua voce.
+// Cele 3 obiecte se numesc: Avion, Roata si Navigatie si fac parte din domeniul aeronavelor
+// Fiecare obiect are cate o functie prorprie: Pentru avion este adaugata o revizie, pentru Roata este crescut numarul de ani iar pentru navigatie este instalata o noua voce.
 
 
-class Vehicul {
+class Avion {
 public:
     const string serie;
     static string tara_inmatriculare;
     string marca;
-    int nr_km;
+    int nr_ore_zbor;
     int nr_revizii;
     int* ani_revizii;
 
     void afisare() {
-        cout << "Vehiculul cu seria de sasiu: " << this->serie << " de marca: " << this->marca << " inmatriculat in tara: " << this->tara_inmatriculare << " are un numar de: " << this->nr_km << " km. ";
+        cout << "Avionul cu seria de sasiu: " << this->serie << " de marca: " << this->marca << " inmatriculat in tara: " << this->tara_inmatriculare << " are un numar de: " << this->nr_ore_zbor << " ore de zbor. ";
             
         if (this->nr_revizii) {
             cout << "Acesteia i - au fost facute : " << this->nr_revizii << " revizii \n" << "Reviziile au fost realizate in anii: ";
@@ -39,16 +39,16 @@ public:
         this->nr_revizii++;
     }
 
-    Vehicul() : serie("9JHWX735") {
+    Avion() : serie("9JHWX735") {
         this->marca = "NoName";
-        this->nr_km = 0;
+        this->nr_ore_zbor = 0;
         this->nr_revizii = 0;
         this->ani_revizii = nullptr;
     }
 
-    Vehicul(string serie, string marca, int nr_km, int nr_revizii, int* ani_revizii) : serie(serie) {
+    Avion(string serie, string marca, int nr_ore_zbor, int nr_revizii, int* ani_revizii) : serie(serie) {
         this->marca = marca;
-        this->nr_km = nr_km;
+        this->nr_ore_zbor = nr_ore_zbor;
         this->nr_revizii = nr_revizii;
         this->ani_revizii = new int[nr_revizii];
         for (int i = 0; i < nr_revizii; i++) {
@@ -56,34 +56,33 @@ public:
         }
     }
 
-    Vehicul(string marca, int nr_km) : serie("9JHWX735") {
+    Avion(string marca, int nr_ore_zbor) : serie("9JHWX735") {
         this->marca = marca;
-        this->nr_km = nr_km;
+        this->nr_ore_zbor = nr_ore_zbor;
         this->nr_revizii = 0;
         this->ani_revizii = nullptr;
     }
 
-    ~Vehicul() {
+    ~Avion() {
         if (this->ani_revizii != nullptr) {
             delete[] this->ani_revizii;
         }
     }
 };
 
-string Vehicul::tara_inmatriculare = "Romania";
+string Avion::tara_inmatriculare = "Romania";
 
 
 class Roata {
 public:
     const string pozitie;
     static string material_pneu;
-    string tip;
     int varsta;
     int nr_pane;
     string* luni_realizare_pana;
 
     void afisare() {
-        cout << "Roapta pozitionata: " << this->pozitie << " cu pneul fabricat din: " << this->material_pneu << " de tipul: " << this->tip << " are o varsta de: " << this->varsta << " ani. ";
+        cout << "Roapta pozitionata: " << this->pozitie << " cu pneul fabricat din: " << this->material_pneu << " are o varsta de: " << this->varsta << " ani. ";
 
         if (this->nr_pane) {
             cout << "Acesteia a avut pana de: " << this->nr_pane << " ori \n" << "Panele au fost facute in lunile: ";
@@ -101,25 +100,21 @@ public:
     }
 
     Roata() : pozitie("Dreapta Fata") {
-        this->tip = "Vara";
         this->varsta = 0;
         this->nr_pane = 0;
         this->luni_realizare_pana = nullptr;
     }
 
-    Roata(string pozitie, string tip, int varsta, int nr_pane, string* luni_realizare_pana) : pozitie(pozitie) {
-        this->tip = tip;
+    Roata(string pozitie, int varsta, int nr_pane, string* luni_realizare_pana) : pozitie(pozitie) {
         this->varsta = varsta;
         this->nr_pane = nr_pane;
         this->luni_realizare_pana = new string[nr_pane];
-
         for (int i = 0; i < nr_pane; i++) {
             this->luni_realizare_pana[i] = luni_realizare_pana[i];
         }
     }
 
-    Roata(string tip, int varsta) : pozitie("Dreapta Fata") {
-        this->tip = tip;
+    Roata(string pozitie, int varsta) : pozitie(pozitie) {
         this->varsta = varsta;
         this->nr_pane = 0;
         this->luni_realizare_pana = nullptr;
@@ -153,7 +148,7 @@ public:
             cout << "\n \n";
         }
         else {
-            cout << "Insa nu exista momentan voci instalate.\n \n";
+            cout << " Insa nu exista momentan voci instalate.\n \n";
         }
     }
     void instalareVoce( string numeVoce) {
@@ -211,23 +206,22 @@ public:
 string Navigatie::tip_conectivitate = "Satelit";
 
 int main() {
-    Vehicul vehicul;
-    vehicul.afisare();
-
+    Avion avion;
+    avion.afisare();
     int ani_revizii_1[] = { 2005, 2006, 2007 };
-    Vehicul vehicul1("2BZQN580", "Bmw", 200000, 3, ani_revizii_1);
-    vehicul1.afisare();
-    Vehicul vehicul2("Audi", 74000);
-    vehicul2.afisare();
-    vehicul2.adaugareRevizie(2023);
-    vehicul2.afisare();
+    Avion avion1("2BZQN580", "Cesna", 200000, 3, ani_revizii_1);
+    avion1.afisare();
+    Avion avion2("Boeing", 74000);
+    avion2.afisare();
+    avion2.adaugareRevizie(2023);
+    avion2.afisare();
 
     Roata roata;
     roata.afisare();
     string luni_pane_1[] = { "ianuarie", "februarie" };
-    Roata roata1("Stanga Spate", "All Season", 4, 2, luni_pane_1);
+    Roata roata1("Spate", 4, 2, luni_pane_1);
     roata1.afisare();
-    Roata roata2("vara", 4);
+    Roata roata2("Fata", 4);
     roata2.afisare();
     roata2.crestereVarstaUnAn();
     roata2.afisare();
