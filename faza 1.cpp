@@ -415,7 +415,7 @@ string Navigatie::tipConectivitate = "Satelit";
 //FUNCTII GLOBALE
 
 void mentenantaAeronava(Avion& avion, Roata& roata, Navigatie& navigatie) {
-    cout << "Se va realiza mentenanta acionului cu seria: " << avion.serie << "ce are un numar de: " << avion.nrOreZbor<<"\n";
+    cout << "Se va realiza mentenanta avionului cu seria: " << avion.serie << "ce are un numar de: " << avion.nrOreZbor<<"\n";
 
 
     //Roata este schimbata daca are un numar de pane mai mare de 3 sau o varsta mai mare de 12 luni
@@ -444,15 +444,15 @@ void mentenantaAeronava(Avion& avion, Roata& roata, Navigatie& navigatie) {
 }
 
 void calculIndiciStare(Avion& avion, Roata& roata, Navigatie& navigatie) {
-    double raportrev;
-    if (avion.nrRevizii && avion.nrOreZbor) raportrev = (double)avion.nrRevizii / (double)avion.nrOreZbor;
+    float raportrev = 0.1;
+    if (avion.nrRevizii && avion.nrOreZbor) raportrev = avion.nrRevizii / (float)avion.nrOreZbor;
     cout << "Raportul reviziilor in functie de numarul orelor de zbor: " << raportrev << "\n";
     cout << "Trebuie realizata o mentenanta anul acesta? : ";
     if (avion.aniRevizii[avion.nrRevizii] == 2023) cout << "NU\n";
     else cout << "Da\n";
-    double raport;
+    float raport;
     if (roata.varsta > 0 && roata.nrPane > 0)
-         raport = (double)roata.varsta / (double)roata.nrPane;
+         raport = (float)roata.varsta / (float)roata.nrPane;
     else  raport = 0;
     cout << "Raportul intre varsta rotii si numarul de pane: " << raport << "\n \n";
 }
@@ -460,6 +460,8 @@ void calculIndiciStare(Avion& avion, Roata& roata, Navigatie& navigatie) {
 int main() {
 
     //FAZA 1
+    cout << "\n \n FAZA 1 \n \n";
+    cout << "Clasa Avion: \n";
     Avion avion;
     avion.afisare();
     int aniRevizii_1[] = { 2005, 2006, 2007 };
@@ -470,16 +472,18 @@ int main() {
     avion2.adaugareRevizie(2023);
     avion2.afisare();
 
+    cout << "\nClasa Roata: \n";
     Roata roata;
     roata.afisare();
     string luni_pane_1[] = { "ianuarie", "februarie" };
-    Roata roata1("Spate", 4, 2, luni_pane_1);
+    Roata roata1("Spate", 1, 2, luni_pane_1);
     roata1.afisare();
     Roata roata2("Fata", 4);
     roata2.afisare();
     roata2.crestereVarstaUnAn();
     roata2.afisare();
 
+    cout << "\nClasa Navigatie: \n";
     Navigatie navigatie;
     navigatie.afisare();
     string nume_voci_1[] = { "Carmen", "Marius" };
@@ -492,15 +496,35 @@ int main() {
     navigatie2.afisare();
     
     //FAZA 2
+    cout << "\n \n FAZA 2 \n \n";
+    //functionalitate operator de copiere
+    cout << "\nFunctionalitate operator de copiere: \n";
+
+    Avion avion3 = avion2;
+    Roata roata3 = roata2;
+    Navigatie navigatie3 = navigatie2;
+
+    cout << "\n \n";
+    if (avion3.getSerie() == avion2.getSerie()) cout << "TRUE \n";
+    else cout << "FALSE\n";
+    if (roata3.getPozitie() == roata2.getPozitie()) cout << "TRUE \n";
+    else cout << "FALSE\n";
+    if (navigatie3.getTipConectivitate() == navigatie2.getTipConectivitate()) cout << "TRUE \n";
+    else cout << "FALSE\n";
+    cout << "\n \n";
+
 
     //functionalitate functii prietene
+    cout << "\nFunctionalitate functii prietene: \n";
     mentenantaAeronava(avion1, roata1, navigatie1);
     cout << "\n";
-    calculIndiciStare(avion2, roata2, navigatie2);
+    calculIndiciStare(avion1, roata1, navigatie1);
 
     //functionalitae get-eri
+    cout << "\nFunctionalitate get-eri: \n";
+
+    //Clasa Avion
     cout << "Avionul cu seria de sasiu: " << avion2.getSerie() << " de marca: " << avion2.getMarca() << " inmatriculat in tara: " << avion2.getTaraInmatriculare() << " are un numar de: " << avion2.getNrOreZbor() << " ore de zbor. ";
-    
     if (avion2.getNrRevizii()) {
         cout << "Acesteia i - au fost facute : " << avion2.getNrRevizii() << " revizii \n" << "Reviziile au fost realizate in anii: ";
         for (int i = 0; i < avion2.getNrRevizii(); i++)
@@ -511,9 +535,8 @@ int main() {
         cout << "Nu au fost efectuate revizii.\n \n";
     }
 
-
+    //Clasa Roata
     cout << "Roata pozitionata: " << roata2.getPozitie() << " cu pneul fabricat din: " << roata2.getMaterialPneu() << " are o varsta de: " << roata2.getVarsta() << " ani. ";
-
     if (roata2.getNrPane()) {
         cout << "Acesteia a avut pana de: " << roata2.getNrPane() << " ori \n" << "Panele au fost facute in lunile: ";
         for (int i = 0; i < roata2.getNrPane(); i++)
@@ -524,8 +547,8 @@ int main() {
         cout << "Roata nu a avut pana pana acum.\n \n";
     }
 
-    cout << "Sistemul de navigatie conectat prin: " << navigatie2.getTipConectivitate() << " de la marca: " << navigatie2.getLimba() << " ofera indicatii in limba " << navigatie2.getLimba();
-
+    //Clasa Navigatie
+    cout << "Sistemul de navigatie conectat prin: " << navigatie2.getTipConectivitate() << " de la marca: " << navigatie2.getMarca() << " ofera indicatii in limba " << navigatie2.getLimba();
     if (navigatie2.getNumarVoci()) {
         cout << " are un numar de: " << navigatie2.getNumarVoci() << " voci. Vocile sunt denumite dupa cum urmeaza: ";
         for (int i = 0; i < navigatie2.getNumarVoci(); i++)
@@ -537,7 +560,7 @@ int main() {
     }
 
     // functionalitate set-eri
-
+    cout << "\nFunctionalitate set-eri: \n";
     avion2.setMarca("Airbus");
     avion2.setNrOreZbor(55000);
     int* anirevizii_3 = new int[5] {1999, 1993, 1994, 2009, 2023};
