@@ -5,22 +5,79 @@ using namespace std;
 // Fiecare obiect are cate o functie prorprie: Pentru avion este adaugata o revizie, pentru Roata este crescut numarul de ani iar pentru navigatie este instalata o noua voce.
 
 
+class Roata;
+class Navigatie;
+
 class Avion {
-public:
+private:
     const string serie;
-    static string tara_inmatriculare;
+    static string taraInmatriculare;
     string marca;
-    int nr_ore_zbor;
-    int nr_revizii;
-    int* ani_revizii;
+    int nrOreZbor;
+    int nrRevizii;
+    int* aniRevizii;
+public:
+    //GET SI SET
+    string getSerie() const {
+        return serie;
+    }
+
+    static string getTaraInmatriculare() {
+        return taraInmatriculare;
+    }
+
+    static void setTaraInmatriculare(string taraInmatriculare) {
+        Avion::taraInmatriculare = taraInmatriculare;
+    }
+
+    string getMarca() {
+        return marca;
+    }
+
+    void setMarca( string marca) {
+        this->marca = marca;
+    }
+
+    int getNrOreZbor() {
+        return nrOreZbor;
+    }
+
+    void setNrOreZbor(int nrOreZbor) {
+        this->nrOreZbor = nrOreZbor;
+    }
+
+    int getNrRevizii() {
+        return nrRevizii;
+    }
+
+
+    int* getAniRevizii()  {
+        return this->aniRevizii;
+    }
+
+    void setAniRevizii(int nrRevizii, int* aniRevizii) {
+
+        if (nrRevizii > 0) {
+            this->nrRevizii = nrRevizii;
+            if (this->aniRevizii != nullptr) {
+                delete[]this->aniRevizii;
+            }
+            this->aniRevizii = new int[this->nrRevizii];
+            for (int i = 0; i < this->nrRevizii; i++) {
+                this->aniRevizii[i] = aniRevizii[i];
+            }
+        }
+    }
+
+    //METODE
 
     void afisare() {
-        cout << "Avionul cu seria de sasiu: " << this->serie << " de marca: " << this->marca << " inmatriculat in tara: " << this->tara_inmatriculare << " are un numar de: " << this->nr_ore_zbor << " ore de zbor. ";
+        cout << "Avionul cu seria de sasiu: " << this->serie << " de marca: " << this->marca << " inmatriculat in tara: " << this->taraInmatriculare << " are un numar de: " << this->nrOreZbor << " ore de zbor. ";
             
-        if (this->nr_revizii) {
-            cout << "Acesteia i - au fost facute : " << this->nr_revizii << " revizii \n" << "Reviziile au fost realizate in anii: ";
-            for (int i = 0; i < this->nr_revizii; i++)
-                cout << this->ani_revizii[i] << " ";
+        if (this->nrRevizii) {
+            cout << "Acesteia i - au fost facute : " << this->nrRevizii << " revizii \n" << "Reviziile au fost realizate in anii: ";
+            for (int i = 0; i < this->nrRevizii; i++)
+                cout << this->aniRevizii[i] << " ";
             cout << "\n \n";
         }
         else {
@@ -29,65 +86,127 @@ public:
     }
 
     void adaugareRevizie(int an) {
-        int* aux = new int[this->nr_revizii + 1];
-        for (int i = 0; i < this->nr_revizii; i++) {
-            aux[i] = this->ani_revizii[i];
+        int* aux = new int[this->nrRevizii + 1];
+        for (int i = 0; i < this->nrRevizii; i++) {
+            aux[i] = this->aniRevizii[i];
         }
-        aux[nr_revizii] = an;
-        delete[] this->ani_revizii;
-        this->ani_revizii = aux;
-        this->nr_revizii++;
+        aux[nrRevizii] = an;
+        if(this->aniRevizii!=nullptr)
+            delete[] this->aniRevizii;
+        this->aniRevizii = aux;
+        this->nrRevizii++;
     }
 
+    //CONSTRUCTORI
     Avion() : serie("9JHWX735") {
         this->marca = "NoName";
-        this->nr_ore_zbor = 0;
-        this->nr_revizii = 0;
-        this->ani_revizii = nullptr;
+        this->nrOreZbor = 0;
+        this->nrRevizii = 0;
+        this->aniRevizii = nullptr;
     }
 
-    Avion(string serie, string marca, int nr_ore_zbor, int nr_revizii, int* ani_revizii) : serie(serie) {
+    Avion(string serie, string marca, int nrOreZbor, int nrRevizii, int* aniRevizii) : serie(serie) {
         this->marca = marca;
-        this->nr_ore_zbor = nr_ore_zbor;
-        this->nr_revizii = nr_revizii;
-        this->ani_revizii = new int[nr_revizii];
-        for (int i = 0; i < nr_revizii; i++) {
-            this->ani_revizii[i] = ani_revizii[i];
+        this->nrOreZbor = nrOreZbor;
+        this->nrRevizii = nrRevizii;
+        this->aniRevizii = new int[nrRevizii];
+        for (int i = 0; i < nrRevizii; i++) {
+            this->aniRevizii[i] = aniRevizii[i];
         }
     }
 
-    Avion(string marca, int nr_ore_zbor) : serie("9JHWX735") {
+    Avion(const Avion& avion) : serie(avion.serie) {
+        this->marca = avion.marca;
+        this->nrOreZbor = avion.nrOreZbor;
+        this->nrRevizii = avion.nrRevizii;
+        this->aniRevizii = new int[this->nrRevizii];
+        for (int i = 0; i < this->nrRevizii; i++) {
+            this->aniRevizii[i] = avion.aniRevizii[i];
+        }
+    }
+
+    Avion(string marca, int nrOreZbor) : serie("9JHWX735") {
         this->marca = marca;
-        this->nr_ore_zbor = nr_ore_zbor;
-        this->nr_revizii = 0;
-        this->ani_revizii = nullptr;
+        this->nrOreZbor = nrOreZbor;
+        this->nrRevizii = 0;
+        this->aniRevizii = nullptr;
     }
 
     ~Avion() {
-        if (this->ani_revizii != nullptr) {
-            delete[] this->ani_revizii;
+        if (this->aniRevizii != nullptr) {
+            delete[] this->aniRevizii;
         }
     }
+
+    friend void mentenantaAeronava(Avion &, Roata &, Navigatie &);
+    friend void calculIndiciStare(Avion&, Roata&, Navigatie&);
+
 };
 
-string Avion::tara_inmatriculare = "Romania";
+string Avion::taraInmatriculare = "Romania";
 
 
 class Roata {
-public:
+private:
     const string pozitie;
-    static string material_pneu;
+    static string materialPneu;
     int varsta;
-    int nr_pane;
-    string* luni_realizare_pana;
+    int nrPane;
+    string* luniRealizarePana;
+
+public:
+    //GET SI SET
+    string getPozitie() const {
+        return pozitie;
+    }
+
+    static string getMaterialPneu() {
+        return materialPneu;
+    }
+
+    static void setMaterialPneu( string materialPneu) {
+        Roata::materialPneu = materialPneu;
+    }
+
+    int getVarsta(){
+        return varsta;
+    }
+
+    void setVarsta(int varsta) {
+        this->varsta = varsta;
+    }
+
+    int getNrPane() {
+        return nrPane;
+    }
+
+    string* getLuniRealizarePana() {
+        return luniRealizarePana;
+    }
+
+    void setLuniRealizarePana(int nrPane, string* luniRealizarePana) {
+        if (nrPane > 0) {
+                this->nrPane = nrPane;
+                if (this->luniRealizarePana != nullptr) {
+                    delete[]this->luniRealizarePana;
+                }
+                this->luniRealizarePana = new string[this->nrPane];
+                for (int i = 0; i < this->nrPane; i++) {
+                    this->luniRealizarePana[i] = luniRealizarePana[i];
+                }
+     
+        }
+    }
+
+    //METODE
 
     void afisare() {
-        cout << "Roapta pozitionata: " << this->pozitie << " cu pneul fabricat din: " << this->material_pneu << " are o varsta de: " << this->varsta << " ani. ";
+        cout << "Roata pozitionata: " << this->pozitie << " cu pneul fabricat din: " << this->materialPneu << " are o varsta de: " << this->varsta << " ani. ";
 
-        if (this->nr_pane) {
-            cout << "Acesteia a avut pana de: " << this->nr_pane << " ori \n" << "Panele au fost facute in lunile: ";
-            for (int i = 0; i < this->nr_pane; i++)
-                cout << this->luni_realizare_pana[i] << " ";
+        if (this->nrPane) {
+            cout << "Acesteia a avut pana de: " << this->nrPane << " ori \n" << "Panele au fost facute in lunile: ";
+            for (int i = 0; i < this->nrPane; i++)
+                cout << this->luniRealizarePana[i] << " ";
             cout << "\n \n";
         }
         else {
@@ -99,117 +218,252 @@ public:
         this->varsta++;
     }
 
+    //CONSTRUCTORI
+
     Roata() : pozitie("Dreapta Fata") {
         this->varsta = 0;
-        this->nr_pane = 0;
-        this->luni_realizare_pana = nullptr;
+        this->nrPane = 0;
+        this->luniRealizarePana = nullptr;
     }
 
-    Roata(string pozitie, int varsta, int nr_pane, string* luni_realizare_pana) : pozitie(pozitie) {
+    Roata(string pozitie, int varsta, int nrPane, string* luniRealizarePana) : pozitie(pozitie) {
         this->varsta = varsta;
-        this->nr_pane = nr_pane;
-        this->luni_realizare_pana = new string[nr_pane];
-        for (int i = 0; i < nr_pane; i++) {
-            this->luni_realizare_pana[i] = luni_realizare_pana[i];
+        this->nrPane = nrPane;
+        this->luniRealizarePana = new string[nrPane];
+        for (int i = 0; i < nrPane; i++) {
+            this->luniRealizarePana[i] = luniRealizarePana[i];
+        }
+    }
+
+    Roata(const Roata& roata) :pozitie(roata.pozitie) {
+        this->varsta = roata.varsta;
+        this->nrPane = roata.nrPane;
+        this->luniRealizarePana = new string[this->nrPane];
+        for (int i = 0; i < this->nrPane; i++) {
+            this->luniRealizarePana[i] = roata.luniRealizarePana[i];
         }
     }
 
     Roata(string pozitie, int varsta) : pozitie(pozitie) {
         this->varsta = varsta;
-        this->nr_pane = 0;
-        this->luni_realizare_pana = nullptr;
+        this->nrPane = 0;
+        this->luniRealizarePana = nullptr;
     }
 
     ~Roata() {
-        if (this->luni_realizare_pana != nullptr) {
-            delete[] this->luni_realizare_pana;
+        if (this->luniRealizarePana != nullptr) {
+            delete[] this->luniRealizarePana;
         }
     }
+
+    friend void mentenantaAeronava(Avion&, Roata&, Navigatie&);
+    friend void calculIndiciStare(Avion&, Roata&, Navigatie&);
 };
 
-string Roata::material_pneu = "Cauciuc";
+string Roata::materialPneu = "Cauciuc";
 
 
 class Navigatie {
-public:
+private:
     const string limba;
-    static string tip_conectivitate;
+    static string tipConectivitate;
     string marca;
-    int numar_voci;
-    string* numele_vocilor;
+    int numarVoci;
+    string* numeleVocilor;
+public:
+    //GET  SI SET
+
+    string getLimba() const {
+        return limba;
+    }
+
+    static string getTipConectivitate() {
+        return tipConectivitate;
+    }
+
+    static void setTipConectivitate( string tipConectivitate) {
+        Navigatie::tipConectivitate = tipConectivitate;
+    }
+
+    string getMarca()  {
+        return marca;
+    }
+
+    void setMarca(const string& marca) {
+        this->marca = marca;
+    }
+
+    int getNumarVoci() {
+        return numarVoci;
+    }
+
+    void setNumarVoci(int newNumarVoci) {
+        this->numarVoci = newNumarVoci;
+    }
+
+    string* getNumeleVocilor() {
+        return numeleVocilor;
+    }
+
+    void setNumeleVocilor(int numarVoci, string* numeleVocilor) {
+        if (numarVoci > 0) {
+            this->numarVoci = numarVoci;
+            if (this->numeleVocilor != nullptr) {
+                delete[]this->numeleVocilor;
+            }
+            this->numeleVocilor = new string[this->numarVoci];
+            for (int i = 0; i < this->numarVoci; i++) {
+                this->numeleVocilor[i] = numeleVocilor[i];
+            }
+
+        }
+    }
+    //METODE
 
     void afisare() {
-        cout << "Sistemul de navigatie conectat prin: " << this->tip_conectivitate << " de la marca: " << this->marca << " ofera indicatii in limba " << this->limba;
+        cout << "Sistemul de navigatie conectat prin: " << this->tipConectivitate << " de la marca: " << this->marca << " ofera indicatii in limba " << this->limba;
 
-        if (this->numar_voci) {
-            cout << " are un numar de: " << this->numar_voci << " voci. Vocile sunt denumite dupa cum urmeaza: ";
-            for (int i = 0; i < this->numar_voci; i++)
-                cout << this->numele_vocilor[i] << " ";
+        if (this->numarVoci) {
+            cout << " are un numar de: " << this->numarVoci << " voci. Vocile sunt denumite dupa cum urmeaza: ";
+            for (int i = 0; i < this->numarVoci; i++)
+                cout << this->numeleVocilor[i] << " ";
             cout << "\n \n";
         }
         else {
             cout << " Insa nu exista momentan voci instalate.\n \n";
         }
     }
-    void instalareVoce( string numeVoce) {
-        string* aux = new string[this->numar_voci + 1];
 
-        for (int i = 0; i < this->numar_voci; i++) {
-            aux[i] = this->numele_vocilor[i];
+    void instalareVoce(const string& numeNou) {
+
+        if (this->numeleVocilor == nullptr) {
+            this->numeleVocilor = new string[1];
+            this->numarVoci = 1;
+            this->numeleVocilor[0] = numeNou;
         }
+        else {
+   
+            string* aux = new string[this->numarVoci + 1];
 
-        aux[this->numar_voci] = numeVoce;
+            for (int i = 0; i < this->numarVoci; i++) {
+                aux[i] = numeleVocilor[i];
+            }
+            aux[this->numarVoci] = numeNou;
 
-        delete[] this->numele_vocilor; 
 
-        this->numele_vocilor = aux; 
+            this->numarVoci++;
 
-        this->numar_voci++;
+            delete[] this->numeleVocilor;
+
+            this->numeleVocilor = aux;
+        }
     }
 
+    //CONSTRUCTORI
 
     Navigatie() : limba("Romana") {
         this->marca = "Google";
-        this->numar_voci = 0;
-        this->numele_vocilor = nullptr;
+        this->numarVoci = 0;
+        this->numeleVocilor = nullptr;
     }
 
-    Navigatie(string limba, string marca, int numar_voci, string* numele_vocilor) : limba(limba) {
+    Navigatie(string limba, string marca, int numarVoci, string* numeleVocilor) : limba(limba) {
         this->marca = marca;
-        this->numar_voci = numar_voci;
-        this->numele_vocilor = new string[numar_voci];
+        this->numarVoci = numarVoci;
 
-        for (int i = 0; i < numar_voci; i++) {
-            this->numele_vocilor[i] = numele_vocilor[i];
+        this->numeleVocilor = new string[numarVoci];
+        for (int i = 0; i < numarVoci; i++) {
+            this->numeleVocilor[i] = numeleVocilor[i];
         }
 
     }
 
+    //Constructorul de copiere
+    Navigatie(const Navigatie& navigatie):limba(navigatie.limba) {
+        this->marca = navigatie.marca;
+        this->numarVoci = navigatie.numarVoci;
 
-    Navigatie(string marca, int numar_voci, string* numele_vocilor) : limba("Romana") {
+        this->numeleVocilor = new string[this->numarVoci];
+        for (int i = 0; i < this->numarVoci; i++) {
+            this->numeleVocilor[i] = navigatie.numeleVocilor[i];
+        }
+    }
+
+    Navigatie(string marca, int numarVoci, string* numeleVocilor) : limba("Romana") {
         this->marca = marca;
-        this->numar_voci = numar_voci;
+        this->numarVoci = numarVoci;
 
-        this->numele_vocilor = new string[numar_voci];
-        for (int i = 0; i < numar_voci; i++) {
-            this->numele_vocilor[i] = numele_vocilor[i];
+        this->numeleVocilor = new string[this->numarVoci];
+        for (int i = 0; i < numarVoci; i++) {
+            this->numeleVocilor[i] = numeleVocilor[i];
         }
     }
 
     ~Navigatie() {
-        if (this->numele_vocilor != nullptr) {
-            delete[] this->numele_vocilor;
+        if (this->numeleVocilor != nullptr) {
+            delete[] this->numeleVocilor;
         }
     }
+
+    friend void mentenantaAeronava(Avion&, Roata& , Navigatie& );
+    friend void calculIndiciStare(Avion&, Roata&, Navigatie&);
+
 };
 
-string Navigatie::tip_conectivitate = "Satelit";
+string Navigatie::tipConectivitate = "Satelit";
+
+//FUNCTII GLOBALE
+
+void mentenantaAeronava(Avion& avion, Roata& roata, Navigatie& navigatie) {
+    cout << "Se va realiza mentenanta acionului cu seria: " << avion.serie << "ce are un numar de: " << avion.nrOreZbor<<"\n";
+
+
+    //Roata este schimbata daca are un numar de pane mai mare de 3 sau o varsta mai mare de 12 luni
+    if (roata.nrPane > 3 || roata.varsta > 12) {
+        roata.nrPane = 0;
+        roata.varsta = 0;
+        string* empty = new string[0];
+        roata.setLuniRealizarePana(0, empty);
+    }
+
+    cout << "Starea rotilor dupa mentenanta:\n";
+    roata.afisare();
+    //Navigatiile de la google nu mai sunt permise deci trebuie schimbate cu unele garmin care au memoria compatibila.
+    if (navigatie.getMarca() == "Google") {
+        navigatie.setMarca("Garmin");
+    }
+
+    if (navigatie.numarVoci == 0 || navigatie.numeleVocilor == nullptr){
+        navigatie.instalareVoce("DefaulAndreea");
+    }
+
+    cout << "Starea navigatiei dupa mentenanta:\n";
+    navigatie.afisare();
+
+    avion.adaugareRevizie(2023);
+}
+
+void calculIndiciStare(Avion& avion, Roata& roata, Navigatie& navigatie) {
+    double raportrev;
+    if (avion.nrRevizii && avion.nrOreZbor) raportrev = (double)avion.nrRevizii / (double)avion.nrOreZbor;
+    cout << "Raportul reviziilor in functie de numarul orelor de zbor: " << raportrev << "\n";
+    cout << "Trebuie realizata o mentenanta anul acesta? : ";
+    if (avion.aniRevizii[avion.nrRevizii] == 2023) cout << "NU\n";
+    else cout << "Da\n";
+    double raport;
+    if (roata.varsta > 0 && roata.nrPane > 0)
+         raport = (double)roata.varsta / (double)roata.nrPane;
+    else  raport = 0;
+    cout << "Raportul intre varsta rotii si numarul de pane: " << raport << "\n \n";
+}
 
 int main() {
+
+    //FAZA 1
     Avion avion;
     avion.afisare();
-    int ani_revizii_1[] = { 2005, 2006, 2007 };
-    Avion avion1("2BZQN580", "Cesna", 200000, 3, ani_revizii_1);
+    int aniRevizii_1[] = { 2005, 2006, 2007 };
+    Avion avion1("2BZQN580", "Cesna", 200000, 3, aniRevizii_1);
     avion1.afisare();
     Avion avion2("Boeing", 74000);
     avion2.afisare();
@@ -236,5 +490,75 @@ int main() {
     navigatie2.afisare();
     navigatie2.instalareVoce("Elena");
     navigatie2.afisare();
+    
+    //FAZA 2
+
+    //functionalitate functii prietene
+    mentenantaAeronava(avion1, roata1, navigatie1);
+    cout << "\n";
+    calculIndiciStare(avion2, roata2, navigatie2);
+
+    //functionalitae get-eri
+    cout << "Avionul cu seria de sasiu: " << avion2.getSerie() << " de marca: " << avion2.getMarca() << " inmatriculat in tara: " << avion2.getTaraInmatriculare() << " are un numar de: " << avion2.getNrOreZbor() << " ore de zbor. ";
+    
+    if (avion2.getNrRevizii()) {
+        cout << "Acesteia i - au fost facute : " << avion2.getNrRevizii() << " revizii \n" << "Reviziile au fost realizate in anii: ";
+        for (int i = 0; i < avion2.getNrRevizii(); i++)
+            cout << avion2.getAniRevizii()[i] << " ";
+        cout << "\n \n";
+    }
+    else {
+        cout << "Nu au fost efectuate revizii.\n \n";
+    }
+
+
+    cout << "Roata pozitionata: " << roata2.getPozitie() << " cu pneul fabricat din: " << roata2.getMaterialPneu() << " are o varsta de: " << roata2.getVarsta() << " ani. ";
+
+    if (roata2.getNrPane()) {
+        cout << "Acesteia a avut pana de: " << roata2.getNrPane() << " ori \n" << "Panele au fost facute in lunile: ";
+        for (int i = 0; i < roata2.getNrPane(); i++)
+            cout << roata2.getLuniRealizarePana()[i] << " ";
+        cout << "\n \n";
+    }
+    else {
+        cout << "Roata nu a avut pana pana acum.\n \n";
+    }
+
+    cout << "Sistemul de navigatie conectat prin: " << navigatie2.getTipConectivitate() << " de la marca: " << navigatie2.getLimba() << " ofera indicatii in limba " << navigatie2.getLimba();
+
+    if (navigatie2.getNumarVoci()) {
+        cout << " are un numar de: " << navigatie2.getNumarVoci() << " voci. Vocile sunt denumite dupa cum urmeaza: ";
+        for (int i = 0; i < navigatie2.getNumarVoci(); i++)
+            cout << navigatie2.getNumeleVocilor()[i] << " ";
+        cout << "\n \n";
+    }
+    else {
+        cout << " Insa nu exista momentan voci instalate.\n \n";
+    }
+
+    // functionalitate set-eri
+
+    avion2.setMarca("Airbus");
+    avion2.setNrOreZbor(55000);
+    int* anirevizii_3 = new int[5] {1999, 1993, 1994, 2009, 2023};
+    avion2.setAniRevizii(5, anirevizii_3);
+    avion2.setTaraInmatriculare("Bulgaria");
+
+    avion2.afisare();
+
+    roata2.setMaterialPneu("Naylon");
+    roata2.setVarsta(12);
+    string* luni = new string[3]{ "ianuaria", "martie", "mai" };
+    roata2.setLuniRealizarePana(3, luni);
+
+    roata2.afisare();
+
+    navigatie2.setMarca("sygic");
+    navigatie2.setTipConectivitate("Radio");
+    string* numevoci_3 = new string[2]{ "Loredana", "Mihai" };
+    navigatie2.setNumeleVocilor(2, numevoci_3);
+
+    navigatie2.afisare();
+
     return 0;
 }
