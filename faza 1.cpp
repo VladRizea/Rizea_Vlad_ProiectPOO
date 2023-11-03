@@ -96,6 +96,51 @@ public:
         this->aniRevizii = aux;
         this->nrRevizii++;
     }
+    //SUPRAINCARCARE OPERATORI
+
+    Avion operator=(const Avion& avion) {
+        if (this != &avion) {
+            this->marca = avion.marca;
+            this->nrOreZbor = avion.nrOreZbor;
+            this->nrRevizii = avion.nrRevizii;
+
+            if (this->aniRevizii != nullptr)
+                delete[]this->aniRevizii;
+
+            this->aniRevizii = new int[this->nrRevizii];
+
+            for (int i = 0; i < nrRevizii; i++) {
+                this->aniRevizii[i] = avion.aniRevizii[i];
+            }
+        }
+        return *this;
+    }
+
+    Avion operator+(const Avion& avion) {
+        Avion aux = *this;
+        aux.nrOreZbor += avion.nrOreZbor;
+        aux.nrRevizii += avion.nrRevizii;
+        if (aux.aniRevizii != nullptr)
+            delete[]aux.aniRevizii;
+        aux.aniRevizii = new int[aux.nrRevizii];
+        for (int i = 0; i <= this->nrRevizii; i++)
+            aux.aniRevizii[i] = this->aniRevizii[i];
+        for (int i = 0; i <= avion.nrRevizii; i++)
+            aux.aniRevizii[i + this->nrRevizii] = avion.aniRevizii[i];
+        return aux;
+
+    }
+
+    Avion operator-(const Avion& avion) {
+        Avion aux = *this;
+        aux.nrOreZbor -= avion.nrOreZbor;
+
+        return aux;
+    }
+
+     bool operator==(const Avion& avion) const{
+         return (this->serie == avion.serie && this->nrOreZbor == avion.nrOreZbor);
+    }
 
     //CONSTRUCTORI
     Avion() : serie("9JHWX735") {
@@ -217,6 +262,54 @@ public:
     void crestereVarstaUnAn() {
         this->varsta++;
     }
+    //SUPRAINCARCARE OPERATORI
+
+    Roata operator=(const Roata& roata) {
+        if (this != &roata) {
+            this->varsta = roata.varsta;
+            this->nrPane = roata.nrPane;
+
+            if (this->luniRealizarePana != nullptr)
+                delete[]this->luniRealizarePana;
+
+            this->luniRealizarePana = new string[this->nrPane];
+
+            for (int i = 0; i < this->nrPane; i++) {
+                this->luniRealizarePana[i] = roata.luniRealizarePana[i];
+            }
+        }
+        return *this;
+    }
+
+    bool operator!=(const Roata& roata) const {
+        return !(this->pozitie == roata.pozitie && this->varsta == roata.varsta && this->nrPane == roata.nrPane);
+    }
+
+    bool operator<(const Roata& roata) const {
+        return this->varsta < roata.varsta;
+    }
+    
+    Roata operator+=(const Roata& roata) {
+        this->varsta += roata.varsta;
+        int nrPaneNou = this->nrPane + roata.nrPane;
+
+        string* luniRealizarePanaNou = new string[nrPaneNou];
+
+        for (int i = 0; i < this->nrPane; i++) {
+            luniRealizarePanaNou[i] = this->luniRealizarePana[i];
+        }
+
+        for (int i = 0; i < roata.nrPane; i++) {
+            luniRealizarePanaNou[i + this->nrPane] = roata.luniRealizarePana[i];
+        }
+
+        delete[] this->luniRealizarePana;
+        this->luniRealizarePana = luniRealizarePanaNou;
+        this->nrPane = nrPaneNou;
+        return *this;
+    }
+
+
 
     //CONSTRUCTORI
 
@@ -359,9 +452,33 @@ public:
         }
     }
 
+    //SUPRAINCARCARE OPERATORI
+
+    Navigatie operator=(const Navigatie& navigatie) {
+        if (this != &navigatie) {
+            this->marca = navigatie.marca;
+            this->numarVoci = navigatie.numarVoci;
+
+            if (this->numeleVocilor != nullptr)
+                delete[]this->numeleVocilor;
+
+            this->numeleVocilor = new string[this->numarVoci];
+
+            for (int i = 0; i < this->numarVoci; i++) {
+                this->numeleVocilor[i] = navigatie.numeleVocilor[i];
+            }
+        }
+        return *this;
+    }
+
+    bool operator<=(const Navigatie& navigatie) const {
+        return this->numarVoci <= navigatie.numarVoci;
+    }
+
+
     //CONSTRUCTORI
 
-    Navigatie() : limba("Romana") {
+    Navigatie() : limba("Engleza") {
         this->marca = "Google";
         this->numarVoci = 0;
         this->numeleVocilor = nullptr;
@@ -389,7 +506,7 @@ public:
         }
     }
 
-    Navigatie(string marca, int numarVoci, string* numeleVocilor) : limba("Romana") {
+    Navigatie(string marca, int numarVoci, string* numeleVocilor) : limba("Engleza") {
         this->marca = marca;
         this->numarVoci = numarVoci;
 
@@ -407,12 +524,51 @@ public:
 
     friend void mentenantaAeronava(Avion&, Roata& , Navigatie& );
     friend void calculIndiciStare(Avion&, Roata&, Navigatie&);
-
+    friend ostream& operator<<(ostream&, Navigatie);
+    friend istream& operator>>(istream&, Navigatie&);
 };
 
 string Navigatie::tipConectivitate = "Satelit";
 
-//FUNCTII GLOBALE
+//SUPRAINCARCARE OPERATORI
+
+ostream& operator<<(ostream& out, Navigatie nav) {
+
+    out << "Sistemul de navigatie conectat prin: " << nav.tipConectivitate << " de la marca: " << nav.marca << " ofera indicatii in limba " << nav.limba;
+
+    if (nav.numarVoci) {
+        out << " are un numar de: " << nav.numarVoci << " voci. Vocile sunt denumite dupa cum urmeaza: ";
+        for (int i = 0; i < nav.numarVoci; i++)
+            out << nav.numeleVocilor[i] << " ";
+        out << "\n \n";
+    }
+    else {
+        out << " Insa nu exista momentan voci instalate.\n \n";
+    }
+
+    return out;
+
+}
+
+istream& operator>>(istream& in, Navigatie& navigatie) {
+    cout << "Introduceti marca:";
+    in >> navigatie.marca;
+    cout << "Introduceti numarul de voci:";
+    in >> navigatie.numarVoci;
+    if (navigatie.numeleVocilor != nullptr) {
+        delete[]navigatie.numeleVocilor;
+    }
+    navigatie.numeleVocilor = new string[navigatie.numarVoci];
+
+    for (int i = 0; i < navigatie.numarVoci; i++) {
+        cout << "Vocea" << i +1 << ": ";
+        in >> navigatie.numeleVocilor[i];
+    }
+
+    return in;
+}
+
+//FUNCTII GLOBALE PRIETENE
 
 void mentenantaAeronava(Avion& avion, Roata& roata, Navigatie& navigatie) {
     cout << "Se va realiza mentenanta avionului cu seria: " << avion.serie << "ce are un numar de: " << avion.nrOreZbor<<"\n";
@@ -582,6 +738,68 @@ int main() {
     navigatie2.setNumeleVocilor(2, numevoci_3);
 
     navigatie2.afisare();
+
+    //FAZA 3
+
+    Avion avion4;
+    avion4.afisare();
+    //Operator =
+    avion4 = avion1;
+    avion4.afisare();
+    //operator +
+    avion4 = avion4 + avion4;
+    avion4.afisare();
+    //operator -
+    cout << "operator -" << '\n';
+    cout <<"inainte: "<< avion4.getNrOreZbor() << '\n';
+    avion4 = avion4 - avion1;
+    cout << "dupa: " << avion4.getNrOreZbor() << '\n';
+    //operator==
+    cout << "operator ==" << '\n';
+    cout << "Sunt identice avioanele? ";
+    if (avion4 == avion4) cout << "DA sunt!\n";
+    else cout << "NU sunt!\n";
+
+    cout << "\n \n";
+
+    Roata roata4;
+    roata4.afisare();
+    //Operator =
+    roata4 = roata2;
+    roata4.afisare();
+    //Operator !=
+    cout << "Sunt diferite rotile? ";
+    if (roata4 != roata1) cout << "DA sunt!\n";
+    else cout << "NU sunt!\n";
+    //Operator <
+    cout << "Este prima roata mai noua decat a 2 a? ";
+    if (roata4 < roata1) cout << "DA este!\n";
+    else cout << "NU este!\n";
+    //Operator +=
+    cout << "\n";
+    roata4 += roata3;
+    roata4.afisare();
+
+    cout << "\n \n";
+
+
+    Navigatie navigatie4;
+    navigatie4.afisare();
+    //Operator =
+    navigatie4 = navigatie3;
+    navigatie4.afisare();
+    //Operator <<
+    cout << "Functionalitate operator << \n";
+    cout << navigatie4;
+    //Operator <=
+    cout << "Are prima navigatie un numar de voci mai mic sau egal fata de a doua? ";
+    if (navigatie4 <= navigatie1) cout << "DA are!\n";
+    else cout << "NU are!\n";
+    //Operator >>
+    cin >> navigatie4;
+    cout << navigatie4;
+
+
 
     return 0;
 }
