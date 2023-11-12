@@ -185,6 +185,7 @@ public:
 
     friend void mentenantaAeronava(Avion &, Roata &, Navigatie &);
     friend void calculIndiciStare(Avion&, Roata&, Navigatie&);
+    friend istream& operator>>(istream&, Avion&);
 
 };
 
@@ -351,6 +352,7 @@ public:
 
     friend void mentenantaAeronava(Avion&, Roata&, Navigatie&);
     friend void calculIndiciStare(Avion&, Roata&, Navigatie&);
+    friend istream& operator>>(istream&, Roata&);
 };
 
 string Roata::materialPneu = "Cauciuc";
@@ -561,8 +563,47 @@ istream& operator>>(istream& in, Navigatie& navigatie) {
     navigatie.numeleVocilor = new string[navigatie.numarVoci];
 
     for (int i = 0; i < navigatie.numarVoci; i++) {
-        cout << "Vocea" << i +1 << ": ";
+        cout << "Numele vocii " << i +1 << " : ";
         in >> navigatie.numeleVocilor[i];
+    }
+
+    return in;
+}
+
+istream& operator>>(istream& in, Roata& roata) {
+    cout << "Introduceti varsta rotii:";
+    in >> roata.varsta;
+    cout << "Introduceti numarul de pane:";
+    in >> roata.nrPane;
+    if (roata.luniRealizarePana != nullptr) {
+        delete[]roata.luniRealizarePana;
+    }
+    roata.luniRealizarePana = new string[roata.nrPane];
+
+    for (int i = 0; i < roata.nrPane; i++) {
+        cout << "Luna in care s-a realizat pana " << i + 1 << ": ";
+        in >> roata.luniRealizarePana[i];
+    }
+
+    return in;
+}
+
+istream& operator>>(istream& in, Avion& avion) {
+    cout << "Introduceti marca avionului:";
+    in >> avion.marca;
+    cout << "Introduceti numarul orelor de zbor:";
+    in >> avion.nrOreZbor;
+    cout << "Introduceti numarul de revizii:";
+    in >> avion.nrRevizii;
+
+    if (avion.aniRevizii != nullptr) {
+        delete[]avion.aniRevizii;
+    }
+    avion.aniRevizii = new int[avion.nrRevizii];
+
+    for (int i = 0; i < avion.nrRevizii; i++) {
+        cout << "Anul in care a fost realizata revizia " << i + 1 << ": ";
+        in >> avion.aniRevizii[i];
     }
 
     return in;
@@ -796,10 +837,109 @@ int main() {
     if (navigatie4 <= navigatie1) cout << "DA are!\n";
     else cout << "NU are!\n";
     //Operator >>
+    cout << "Functionalitate operator >> \n";
     cin >> navigatie4;
     cout << navigatie4;
 
 
+    //FAZA 4
+
+    //Vector avion
+    int numarElemente = 0;
+    cout << "Introduceti numarul de avioane pe care doriti sa le aveti in vector:";
+    cin >> numarElemente;
+    Avion* vAvion = new Avion[numarElemente];
+    for (int i = 0; i < numarElemente; i++) {
+        cout << "Citire avion " << i + 1 << " :\n";
+        cin >> vAvion[i];
+    }
+
+    for (int i = 0; i < numarElemente; i++) {
+        cout << "Avionul cu numarul " << i + 1 << "\n";
+        vAvion[i].afisare();
+        cout << "\n";
+    }
+
+    //Vector roata
+    numarElemente = 0;
+    cout << "Introduceti numarul de roti pe care doriti sa le aveti in vector:";
+    cin >> numarElemente;
+    Roata* vRoata = new Roata[numarElemente];
+    for (int i = 0; i < numarElemente; i++) {
+        cout << "Citire roata " << i + 1 << " :\n";
+        cin >> vRoata[i];
+    }
+
+    for (int i = 0; i < numarElemente; i++) {
+        cout << "Roata cu numarul " << i + 1 << "\n";
+        vRoata[i].afisare();
+        cout << "\n";
+    }
+
+    //Vector navigatie
+    numarElemente = 0;
+    cout << "Introduceti numarul de navigatii pe care doriti sa le aveti in vector:";
+    cin >> numarElemente;
+    Navigatie* vNavigatie = new Navigatie[numarElemente];
+    for (int i = 0; i < numarElemente; i++) {
+        cout << "Citire navigatia " << i + 1 << " :\n";
+        cin >> vNavigatie[i];
+    }
+
+    for (int i = 0; i < numarElemente; i++) {
+        cout << "Navigatia cu numarul " << i + 1 << "\n";
+        vNavigatie[i].afisare();
+        cout << "\n";
+    }
+
+    //Matricea la alegere (Avioane)
+
+    int linii = 0, coloane = 0;
+    cout << "Introduceti numatul de linii ale matricei: ";
+    cin >> linii;
+    cout << "Introduceti numatul de coloane ale matricei: ";
+    cin >> coloane;
+
+    Avion** mAvion = new Avion * [linii];
+    for (int i = 0; i < linii; i++) {
+        mAvion[i] = new Avion[coloane];
+    }
+
+    for (int i = 0; i < linii; i++) {
+        for (int j = 0; j < coloane; j++) {
+            cout << "Citire avion de pe linia " << i + 1 << " si coloana " << j + 1 << "\n";
+            cin >> mAvion[i][j];
+        }
+    }
+
+    for (int i = 0; i < linii; i++) {
+        for (int j = 0; j < coloane; j++) {
+            cout << "Afisare avion de pe linia " << i + 1 << " si coloana " << j + 1 << "\n";
+            mAvion[i][j].afisare();
+        }
+    }
+
+
+    //Eliberare memorie
+
+    if (linii != 0) {
+        for (int i = 0; i < linii; ++i)
+            delete[] mAvion[i];
+    }
+
+    if (mAvion != nullptr) {
+        delete[] mAvion;
+    }
+
+    if (vAvion != nullptr) {
+        delete[]vAvion;
+    }
+    if (vRoata != nullptr) {
+        delete[]vRoata;
+    }
+    if (vNavigatie != nullptr) {
+        delete[]vNavigatie;
+    }
 
     return 0;
 }
