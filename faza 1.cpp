@@ -532,8 +532,130 @@ public:
 
 string Navigatie::tipConectivitate = "Satelit";
 
-//SUPRAINCARCARE OPERATORI
 
+class Hangar {
+private:
+    bool esteOperational;
+    int suprafata;
+    int numarAvioane;
+    Avion* avioane;
+public:
+    //get si set
+
+    bool getEsteOperational() const {
+        return this->esteOperational;
+    }
+    void setEsteOperational(bool este) {
+        this->esteOperational = este;
+    }
+
+    int getSuprafata() const {
+        return this->suprafata;
+    }
+
+    void setSuprafata(int numar) {
+        this->suprafata = numar;
+    }
+
+    int getNumarAvioane() const {
+        return this->numarAvioane;
+    }
+
+    Avion* getAvioane() {
+        return this->avioane;
+    }
+
+    void setNumarAvioane(int numar, Avion* avioane) {
+        numarAvioane = numar;
+        if (this->avioane != nullptr) {
+            delete[]avioane;
+        }
+        this->avioane = new Avion[numarAvioane];
+
+        for (int i = 0; i < this->numarAvioane; i++)
+            this->avioane[i] = avioane[i];
+    }
+
+    //constructori
+    Hangar(): esteOperational(1), suprafata(100), numarAvioane(0), avioane(nullptr) {
+    }
+    Hangar(bool esteOperational, int suprafata, int numarAvioane, Avion* avioane) {
+        this->esteOperational = esteOperational;
+        this->suprafata = suprafata;
+        this->numarAvioane = numarAvioane;
+        this->avioane = new Avion[numarAvioane];
+        for (int i = 0; i < this->numarAvioane; i++) {
+            this->avioane[i] = avioane[i];
+        }
+    }
+
+    Hangar(const Hangar& hangar) {
+        this->esteOperational = hangar.esteOperational;
+        this->suprafata = hangar.suprafata;
+        this->numarAvioane = 0;
+        this->avioane = new Avion[numarAvioane];
+        for (int i = 0; i < this->numarAvioane; i++) {
+            this->avioane[i] = hangar.avioane[i];
+        }
+    }
+
+
+    ~Hangar() {
+        delete[] avioane;
+    }
+
+    //Supraincarcare operatori
+
+    Hangar& operator=(const Hangar& hangar) {
+        if (this != &hangar) {
+            this->esteOperational = hangar.esteOperational;
+            this->suprafata = hangar.suprafata;
+            this->numarAvioane = hangar.numarAvioane;
+            if (avioane != nullptr) {
+                delete[]this->avioane;
+            }
+            avioane = new Avion[this->numarAvioane];
+            for (int i = 0; i < hangar.numarAvioane; ++i) {
+                avioane[i] = hangar.avioane[i];
+            }
+        }
+        return *this;
+    }
+
+    friend istream& operator>>(istream& in, Hangar& hangar) {
+        cout << "\nEste operational? (1 da, 0 nu)";
+        in >> hangar.esteOperational;
+        cout << "\nSuprafata: ";
+        in >> hangar.suprafata;
+        cout << "\nNumar avioane: ";
+        in>> hangar.numarAvioane;
+        hangar.avioane = new Avion[hangar.numarAvioane];
+        cout << "\nCitire Avioane: ";
+        for (int i = 0; i < hangar.numarAvioane; ++i) {
+            in >> hangar.avioane[i];
+        }
+        cout << "\n";
+
+        return in;
+    }
+
+    friend ostream& operator<<(ostream& out, const Hangar& hangar) {
+        out << "Hangar este " << (hangar.esteOperational ? "operational." : "neoperational.") << endl;
+        out << "Suprafata hangarului: " << hangar.suprafata << " metri patrati." << endl;
+        out << "Numarul actual de avioane: " << hangar.numarAvioane << endl;
+        out << "Avioanele din hangar:" << endl;
+        for (int i = 0; i < hangar.numarAvioane; i++) {
+            hangar.avioane[i].afisare();
+        }
+        return out;
+    }
+
+
+
+};
+
+
+//SUPRAINCARCARE OPERATORI
 ostream& operator<<(ostream& out, Navigatie nav) {
 
     out << "Sistemul de navigatie conectat prin: " << nav.tipConectivitate << " de la marca: " << nav.marca << " ofera indicatii in limba " << nav.limba;
@@ -940,6 +1062,20 @@ int main() {
     if (vNavigatie != nullptr) {
         delete[]vNavigatie;
     }
+
+    //FAZA 5
+
+    Hangar hangar;
+
+    cin >> hangar;
+
+    cout << hangar.getEsteOperational();
+    Hangar hangar2 = hangar;
+    Hangar hangar3;
+    hangar3 = hangar2;
+    cout << hangar;
+    cout << hangar3;
+
 
     return 0;
 }
