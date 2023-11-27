@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 using namespace std;
 
 // Cele 3 obiecte se numesc: Avion, Roata si Navigatie si fac parte din domeniul aeronavelor
@@ -85,6 +86,42 @@ public:
         }
     }
 
+    void writeB(const char* filename) {
+        ofstream out(filename, ios::binary | ios::out);
+        int marcaLength = marca.length();
+        out.write((char*)(&marcaLength), sizeof(int));
+        out.write(marca.c_str(), marcaLength);
+        
+        out.write((char*)(&nrOreZbor), sizeof(int));
+        out.write((char*)(&nrRevizii), sizeof(int));
+        out.write((char*)(aniRevizii), sizeof(int) * nrRevizii);
+
+        out.close();
+      
+
+    }
+
+    void readB(const char* filename) {
+        ifstream in(filename, ios::binary | ios::in);
+
+        int marcaLength;
+        in.read((char*)(&marcaLength), sizeof(int));
+        char* marcaBuffer = new char[marcaLength + 1];
+        in.read(marcaBuffer, marcaLength);
+        marcaBuffer[marcaLength] = '\0';
+        marca = marcaBuffer;
+        delete[] marcaBuffer;
+
+        in.read((char*)(&nrOreZbor), sizeof(int));
+        in.read((char*)(&nrRevizii), sizeof(int));
+        aniRevizii = new int[nrRevizii];
+        in.read((char*)(aniRevizii), sizeof(int) * nrRevizii);
+
+        in.close();
+
+    }
+
+
     void adaugareRevizie(int an) {
         int* aux = new int[this->nrRevizii + 1];
         for (int i = 0; i < this->nrRevizii; i++) {
@@ -96,6 +133,7 @@ public:
         this->aniRevizii = aux;
         this->nrRevizii++;
     }
+
     //SUPRAINCARCARE OPERATORI
 
     Avion operator=(const Avion& avion) {
@@ -186,6 +224,33 @@ public:
     friend void mentenantaAeronava(Avion &, Roata &, Navigatie &);
     friend void calculIndiciStare(Avion&, Roata&, Navigatie&);
     friend istream& operator>>(istream&, Avion&);
+
+    friend ofstream& operator<<(ofstream& out, const Avion& avion)
+    {
+        out << avion.marca << "\n" << avion.nrOreZbor << "\n" << avion.nrRevizii << "\n";
+        for (int i = 0; i < avion.nrRevizii; i++)
+            out << avion.aniRevizii[i] << " ";
+        out << "\n";
+        return out;
+    }
+
+    friend ifstream& operator>>(ifstream& in, Avion& avion)
+    {
+
+        in >> avion.marca;
+        in >> avion.nrOreZbor;
+        in >> avion.nrRevizii;
+        if (avion.aniRevizii != nullptr)
+        {
+            delete[]avion.aniRevizii;
+        }
+        avion.aniRevizii = new int[avion.nrRevizii];
+        for (int i = 0; i < avion.nrRevizii; i++)
+        {
+            in >> avion.aniRevizii[i];
+        }
+        return in;
+    }
 
 };
 
@@ -314,7 +379,7 @@ public:
 
     //CONSTRUCTORI
 
-    Roata() : pozitie("Dreapta Fata") {
+    Roata() : pozitie("Fata") {
         this->varsta = 0;
         this->nrPane = 0;
         this->luniRealizarePana = nullptr;
@@ -353,6 +418,7 @@ public:
     friend void mentenantaAeronava(Avion&, Roata&, Navigatie&);
     friend void calculIndiciStare(Avion&, Roata&, Navigatie&);
     friend istream& operator>>(istream&, Roata&);
+
 };
 
 string Roata::materialPneu = "Cauciuc";
@@ -427,6 +493,47 @@ public:
         else {
             cout << " Insa nu exista momentan voci instalate.\n \n";
         }
+    }
+
+    void writeB(const char* filename) {
+        ofstream out(filename, ios::binary | ios::out);
+        int marcaLength = marca.length();
+        out.write((char*)(&marcaLength), sizeof(int));
+        out.write(marca.c_str(), marcaLength);
+
+        out.write((char*)(&numarVoci), sizeof(int));
+        for (int i = 0; i < numarVoci; ++i) {
+            int length = numeleVocilor[i].length();
+            out.write((char*)(&length), sizeof(int));
+            out.write(numeleVocilor[i].c_str(), length);
+        }
+
+        out.close();
+    }
+
+    void readB(const char* filename) {
+        ifstream in(filename, ios::binary | ios::in);
+        int marcaLength;
+        in.read((char*)(&marcaLength), sizeof(int));
+        char* marcaBuffer = new char[marcaLength + 1];
+        in.read(marcaBuffer, marcaLength);
+        marcaBuffer[marcaLength] = '\0';
+        marca = marcaBuffer;
+        delete[] marcaBuffer;
+
+        in.read((char*)(&numarVoci), sizeof(int));
+        numeleVocilor = new string[numarVoci];
+        for (int i = 0; i < numarVoci; ++i) {
+            int length;
+            in.read((char*)(&length), sizeof(int));
+            char* buffer = new char[length + 1];
+            in.read(buffer, length);
+            buffer[length] = '\0';
+            numeleVocilor[i] = buffer;
+            delete[] buffer;
+        }
+
+        in.close();
     }
 
     void instalareVoce(const string& numeNou) {
@@ -528,6 +635,31 @@ public:
     friend void calculIndiciStare(Avion&, Roata&, Navigatie&);
     friend ostream& operator<<(ostream&, Navigatie);
     friend istream& operator>>(istream&, Navigatie&);
+    friend ofstream& operator<<(ofstream& out, const Navigatie& navigatie)
+    {
+        out << navigatie.marca << "\n" << navigatie.numarVoci << "\n";
+        for (int i = 0; i < navigatie.numarVoci; i++)
+            out << navigatie.numeleVocilor[i] << " ";
+        out << "\n";
+        return out;
+    }
+
+    friend ifstream& operator>>(ifstream& in, Navigatie& navigatie)
+    {
+
+        in >> navigatie.marca;
+        in >> navigatie.numarVoci;
+        if (navigatie.numeleVocilor != nullptr)
+        {
+            delete[]navigatie.numeleVocilor;
+        }
+        navigatie.numeleVocilor = new string[navigatie.numarVoci];
+        for (int i = 0; i < navigatie.numarVoci; i++)
+        {
+            in >> navigatie.numeleVocilor[i];
+        }
+        return in;
+    }
 };
 
 string Navigatie::tipConectivitate = "Satelit";
@@ -763,7 +895,7 @@ void mentenantaAeronava(Avion& avion, Roata& roata, Navigatie& navigatie) {
 }
 
 void calculIndiciStare(Avion& avion, Roata& roata, Navigatie& navigatie) {
-    float raportrev = 0.1;
+    float raportrev = 0.1f;
     if (avion.nrRevizii && avion.nrOreZbor) raportrev = avion.nrRevizii / (float)avion.nrOreZbor;
     cout << "Raportul reviziilor in functie de numarul orelor de zbor: " << raportrev << "\n";
     cout << "Trebuie realizata o mentenanta anul acesta? : ";
@@ -778,304 +910,342 @@ void calculIndiciStare(Avion& avion, Roata& roata, Navigatie& navigatie) {
 
 int main() {
 
-    //FAZA 1
-    cout << "\n \n FAZA 1 \n \n";
-    cout << "Clasa Avion: \n";
-    Avion avion;
-    avion.afisare();
-    int aniRevizii_1[] = { 2005, 2006, 2007 };
-    Avion avion1("2BZQN580", "Cesna", 200000, 3, aniRevizii_1);
-    avion1.afisare();
-    Avion avion2("Boeing", 74000);
-    avion2.afisare();
-    avion2.adaugareRevizie(2023);
-    avion2.afisare();
+    ////FAZA 1
+    //cout << "\n \n FAZA 1 \n \n";
+    //cout << "Clasa Avion: \n";
+    //Avion avion;
+    //avion.afisare();
+    //int aniRevizii_1[] = { 2005, 2006, 2007 };
+    //Avion avion1("2BZQN580", "Cesna", 200000, 3, aniRevizii_1);
+    //avion1.afisare();
+    //Avion avion2("Boeing", 74000);
+    //avion2.afisare();
+    //avion2.adaugareRevizie(2023);
+    //avion2.afisare();
 
-    cout << "\nClasa Roata: \n";
-    Roata roata;
-    roata.afisare();
-    string luni_pane_1[] = { "ianuarie", "februarie" };
-    Roata roata1("Spate", 1, 2, luni_pane_1);
-    roata1.afisare();
-    Roata roata2("Fata", 4);
-    roata2.afisare();
-    roata2.crestereVarstaUnAn();
-    roata2.afisare();
+    //cout << "\nClasa Roata: \n";
+    //Roata roata;
+    //roata.afisare();
+    //string luni_pane_1[] = { "ianuarie", "februarie" };
+    //Roata roata1("Spate", 1, 2, luni_pane_1);
+    //roata1.afisare();
+    //Roata roata2("Fata", 4);
+    //roata2.afisare();
+    //roata2.crestereVarstaUnAn();
+    //roata2.afisare();
 
-    cout << "\nClasa Navigatie: \n";
-    Navigatie navigatie;
-    navigatie.afisare();
-    string nume_voci_1[] = { "Carmen", "Marius" };
-    Navigatie navigatie1("Italiana", "Garmin", 2, nume_voci_1);
-    navigatie1.afisare();
-    string nume_voci_2[] = { "Andrei", "Maria", "Doina"};
-    Navigatie navigatie2("Nokia", 3, nume_voci_2);
-    navigatie2.afisare();
-    navigatie2.instalareVoce("Elena");
-    navigatie2.afisare();
+    //cout << "\nClasa Navigatie: \n";
+    //Navigatie navigatie;
+    //navigatie.afisare();
+    //string nume_voci_1[] = { "Carmen", "Marius" };
+    //Navigatie navigatie1("Italiana", "Garmin", 2, nume_voci_1);
+    //navigatie1.afisare();
+    //string nume_voci_2[] = { "Andrei", "Maria", "Doina"};
+    //Navigatie navigatie2("Nokia", 3, nume_voci_2);
+    //navigatie2.afisare();
+    //navigatie2.instalareVoce("Elena");
+    //navigatie2.afisare();
+    //
+    ////FAZA 2
+    //cout << "\n \n FAZA 2 \n \n";
+    ////functionalitate operator de copiere
+    //cout << "\nFunctionalitate operator de copiere: \n";
+
+    //Avion avion3 = avion2;
+    //Roata roata3 = roata2;
+    //Navigatie navigatie3 = navigatie2;
+
+    //cout << "\n \n";
+    //if (avion3.getSerie() == avion2.getSerie()) cout << "TRUE \n";
+    //else cout << "FALSE\n";
+    //if (roata3.getPozitie() == roata2.getPozitie()) cout << "TRUE \n";
+    //else cout << "FALSE\n";
+    //if (navigatie3.getTipConectivitate() == navigatie2.getTipConectivitate()) cout << "TRUE \n";
+    //else cout << "FALSE\n";
+    //cout << "\n \n";
+
+
+    ////functionalitate functii prietene
+    //cout << "\nFunctionalitate functii prietene: \n";
+    //mentenantaAeronava(avion1, roata1, navigatie1);
+    //cout << "\n";
+    //calculIndiciStare(avion1, roata1, navigatie1);
+
+    ////functionalitae get-eri
+    //cout << "\nFunctionalitate get-eri: \n";
+
+    ////Clasa Avion
+    //cout << "Avionul cu seria de sasiu: " << avion2.getSerie() << " de marca: " << avion2.getMarca() << " inmatriculat in tara: " << avion2.getTaraInmatriculare() << " are un numar de: " << avion2.getNrOreZbor() << " ore de zbor. ";
+    //if (avion2.getNrRevizii()) {
+    //    cout << "Acesteia i - au fost facute : " << avion2.getNrRevizii() << " revizii \n" << "Reviziile au fost realizate in anii: ";
+    //    for (int i = 0; i < avion2.getNrRevizii(); i++)
+    //        cout << avion2.getAniRevizii()[i] << " ";
+    //    cout << "\n \n";
+    //}
+    //else {
+    //    cout << "Nu au fost efectuate revizii.\n \n";
+    //}
+
+    ////Clasa Roata
+    //cout << "Roata pozitionata: " << roata2.getPozitie() << " cu pneul fabricat din: " << roata2.getMaterialPneu() << " are o varsta de: " << roata2.getVarsta() << " ani. ";
+    //if (roata2.getNrPane()) {
+    //    cout << "Acesteia a avut pana de: " << roata2.getNrPane() << " ori \n" << "Panele au fost facute in lunile: ";
+    //    for (int i = 0; i < roata2.getNrPane(); i++)
+    //        cout << roata2.getLuniRealizarePana()[i] << " ";
+    //    cout << "\n \n";
+    //}
+    //else {
+    //    cout << "Roata nu a avut pana pana acum.\n \n";
+    //}
+
+    ////Clasa Navigatie
+    //cout << "Sistemul de navigatie conectat prin: " << navigatie2.getTipConectivitate() << " de la marca: " << navigatie2.getMarca() << " ofera indicatii in limba " << navigatie2.getLimba();
+    //if (navigatie2.getNumarVoci()) {
+    //    cout << " are un numar de: " << navigatie2.getNumarVoci() << " voci. Vocile sunt denumite dupa cum urmeaza: ";
+    //    for (int i = 0; i < navigatie2.getNumarVoci(); i++)
+    //        cout << navigatie2.getNumeleVocilor()[i] << " ";
+    //    cout << "\n \n";
+    //}
+    //else {
+    //    cout << " Insa nu exista momentan voci instalate.\n \n";
+    //}
+
+    //// functionalitate set-eri
+    //cout << "\nFunctionalitate set-eri: \n";
+    //avion2.setMarca("Airbus");
+    //avion2.setNrOreZbor(55000);
+    //int* anirevizii_3 = new int[5] {1999, 1993, 1994, 2009, 2023};
+    //avion2.setAniRevizii(5, anirevizii_3);
+    //avion2.setTaraInmatriculare("Bulgaria");
+
+    //avion2.afisare();
+
+    //roata2.setMaterialPneu("Naylon");
+    //roata2.setVarsta(12);
+    //string* luni = new string[3]{ "ianuaria", "martie", "mai" };
+    //roata2.setLuniRealizarePana(3, luni);
+
+    //roata2.afisare();
+
+    //navigatie2.setMarca("sygic");
+    //navigatie2.setTipConectivitate("Radio");
+    //string* numevoci_3 = new string[2]{ "Loredana", "Mihai" };
+    //navigatie2.setNumeleVocilor(2, numevoci_3);
+
+    //navigatie2.afisare();
+
+    ////FAZA 3
+
+    //Avion avion4;
+    //avion4.afisare();
+    ////Operator =
+    //avion4 = avion1;
+    //avion4.afisare();
+    ////operator +
+    //avion4 = avion4 + avion4;
+    //avion4.afisare();
+    ////operator -
+    //cout << "operator -" << '\n';
+    //cout <<"inainte: "<< avion4.getNrOreZbor() << '\n';
+    //avion4 = avion4 - avion1;
+    //cout << "dupa: " << avion4.getNrOreZbor() << '\n';
+    ////operator==
+    //cout << "operator ==" << '\n';
+    //cout << "Sunt identice avioanele? ";
+    //if (avion4 == avion4) cout << "DA sunt!\n";
+    //else cout << "NU sunt!\n";
+
+    //cout << "\n \n";
+
+    //Roata roata4;
+    //roata4.afisare();
+    ////Operator =
+    //roata4 = roata2;
+    //roata4.afisare();
+    ////Operator !=
+    //cout << "Sunt diferite rotile? ";
+    //if (roata4 != roata1) cout << "DA sunt!\n";
+    //else cout << "NU sunt!\n";
+    ////Operator <
+    //cout << "Este prima roata mai noua decat a 2 a? ";
+    //if (roata4 < roata1) cout << "DA este!\n";
+    //else cout << "NU este!\n";
+    ////Operator +=
+    //cout << "\n";
+    //roata4 += roata3;
+    //roata4.afisare();
+
+    //cout << "\n \n";
+
+
+    //Navigatie navigatie4;
+    //navigatie4.afisare();
+    ////Operator =
+    //navigatie4 = navigatie3;
+    //navigatie4.afisare();
+    ////Operator <<
+    //cout << "Functionalitate operator << \n";
+    //cout << navigatie4;
+    ////Operator <=
+    //cout << "Are prima navigatie un numar de voci mai mic sau egal fata de a doua? ";
+    //if (navigatie4 <= navigatie1) cout << "DA are!\n";
+    //else cout << "NU are!\n";
+    ////Operator >>
+    //cout << "Functionalitate operator >> \n";
+    //cin >> navigatie4;
+    //cout << navigatie4;
+
+
+    ////FAZA 4
+
+    ////Vector avion
+    //int numarElemente = 0;
+    //cout << "Introduceti numarul de avioane pe care doriti sa le aveti in vector:";
+    //cin >> numarElemente;
+    //Avion* vAvion = new Avion[numarElemente];
+    //for (int i = 0; i < numarElemente; i++) {
+    //    cout << "Citire avion " << i + 1 << " :\n";
+    //    cin >> vAvion[i];
+    //}
+
+    //for (int i = 0; i < numarElemente; i++) {
+    //    cout << "Avionul cu numarul " << i + 1 << "\n";
+    //    vAvion[i].afisare();
+    //    cout << "\n";
+    //}
+
+    ////Vector roata
+    //numarElemente = 0;
+    //cout << "Introduceti numarul de roti pe care doriti sa le aveti in vector:";
+    //cin >> numarElemente;
+    //Roata* vRoata = new Roata[numarElemente];
+    //for (int i = 0; i < numarElemente; i++) {
+    //    cout << "Citire roata " << i + 1 << " :\n";
+    //    cin >> vRoata[i];
+    //}
+
+    //for (int i = 0; i < numarElemente; i++) {
+    //    cout << "Roata cu numarul " << i + 1 << "\n";
+    //    vRoata[i].afisare();
+    //    cout << "\n";
+    //}
+
+    ////Vector navigatie
+    //numarElemente = 0;
+    //cout << "Introduceti numarul de navigatii pe care doriti sa le aveti in vector:";
+    //cin >> numarElemente;
+    //Navigatie* vNavigatie = new Navigatie[numarElemente];
+    //for (int i = 0; i < numarElemente; i++) {
+    //    cout << "Citire navigatia " << i + 1 << " :\n";
+    //    cin >> vNavigatie[i];
+    //}
+
+    //for (int i = 0; i < numarElemente; i++) {
+    //    cout << "Navigatia cu numarul " << i + 1 << "\n";
+    //    vNavigatie[i].afisare();
+    //    cout << "\n";
+    //}
+
+    ////Matricea la alegere (Avioane)
+
+    //int linii = 0, coloane = 0;
+    //cout << "Introduceti numatul de linii ale matricei: ";
+    //cin >> linii;
+    //cout << "Introduceti numatul de coloane ale matricei: ";
+    //cin >> coloane;
+
+    //Avion** mAvion = new Avion * [linii];
+    //for (int i = 0; i < linii; i++) {
+    //    mAvion[i] = new Avion[coloane];
+    //}
+
+    //for (int i = 0; i < linii; i++) {
+    //    for (int j = 0; j < coloane; j++) {
+    //        cout << "Citire avion de pe linia " << i + 1 << " si coloana " << j + 1 << "\n";
+    //        cin >> mAvion[i][j];
+    //    }
+    //}
+
+    //for (int i = 0; i < linii; i++) {
+    //    for (int j = 0; j < coloane; j++) {
+    //        cout << "Afisare avion de pe linia " << i + 1 << " si coloana " << j + 1 << "\n";
+    //        mAvion[i][j].afisare();
+    //    }
+    //}
+
+
+    ////Eliberare memorie
+
+    //if (linii != 0) {
+    //    for (int i = 0; i < linii; ++i)
+    //        delete[] mAvion[i];
+    //}
+
+    //if (mAvion != nullptr) {
+    //    delete[] mAvion;
+    //}
+
+    //if (vAvion != nullptr) {
+    //    delete[]vAvion;
+    //}
+    //if (vRoata != nullptr) {
+    //    delete[]vRoata;
+    //}
+    //if (vNavigatie != nullptr) {
+    //    delete[]vNavigatie;
+    //}
+
+    ////FAZA 5
+
+    //Hangar hangar;
+
+    //cin >> hangar;
+
+    //cout << hangar.getEsteOperational();
+    //Hangar hangar2 = hangar;
+    //Hangar hangar3;
+    //hangar3 = hangar2;
+    //cout << hangar;
+    //cout << hangar3;
+
+    //FAZA 6
+    //prima clas txt
+    ofstream aviOut("avioane.txt", ios::out);
+    Avion avion10;
+    cin >> avion10;
+    aviOut << avion10;
+    aviOut.close();
+    ifstream aviIn("avioane.txt", ios::in);
+    Avion avion11;
+    aviIn >> avion11;
+    avion11.afisare();
+    aviIn.close();
+    //a doua clasa txt
+    ofstream navOut("roti.txt", ios::out);
+    Navigatie navigatie10;
+    cin >> navigatie10;
+    navOut << navigatie10;
+    navOut.close();
+    ifstream navIn("roti.txt", ios::in);
+    Navigatie navigatie11;
+    navIn >> navigatie11;
+    navigatie11.afisare();
+    navIn.close();
+
+    //prima clasa fisier binar
     
-    //FAZA 2
-    cout << "\n \n FAZA 2 \n \n";
-    //functionalitate operator de copiere
-    cout << "\nFunctionalitate operator de copiere: \n";
+    Avion avion12, avion13;
+    cin >> avion12;
+    avion12.writeB("avioane.bin");
+    avion13.readB("avioane.bin");
+    avion13.afisare();
 
-    Avion avion3 = avion2;
-    Roata roata3 = roata2;
-    Navigatie navigatie3 = navigatie2;
+    //a doua clasa fisier binar
 
-    cout << "\n \n";
-    if (avion3.getSerie() == avion2.getSerie()) cout << "TRUE \n";
-    else cout << "FALSE\n";
-    if (roata3.getPozitie() == roata2.getPozitie()) cout << "TRUE \n";
-    else cout << "FALSE\n";
-    if (navigatie3.getTipConectivitate() == navigatie2.getTipConectivitate()) cout << "TRUE \n";
-    else cout << "FALSE\n";
-    cout << "\n \n";
-
-
-    //functionalitate functii prietene
-    cout << "\nFunctionalitate functii prietene: \n";
-    mentenantaAeronava(avion1, roata1, navigatie1);
-    cout << "\n";
-    calculIndiciStare(avion1, roata1, navigatie1);
-
-    //functionalitae get-eri
-    cout << "\nFunctionalitate get-eri: \n";
-
-    //Clasa Avion
-    cout << "Avionul cu seria de sasiu: " << avion2.getSerie() << " de marca: " << avion2.getMarca() << " inmatriculat in tara: " << avion2.getTaraInmatriculare() << " are un numar de: " << avion2.getNrOreZbor() << " ore de zbor. ";
-    if (avion2.getNrRevizii()) {
-        cout << "Acesteia i - au fost facute : " << avion2.getNrRevizii() << " revizii \n" << "Reviziile au fost realizate in anii: ";
-        for (int i = 0; i < avion2.getNrRevizii(); i++)
-            cout << avion2.getAniRevizii()[i] << " ";
-        cout << "\n \n";
-    }
-    else {
-        cout << "Nu au fost efectuate revizii.\n \n";
-    }
-
-    //Clasa Roata
-    cout << "Roata pozitionata: " << roata2.getPozitie() << " cu pneul fabricat din: " << roata2.getMaterialPneu() << " are o varsta de: " << roata2.getVarsta() << " ani. ";
-    if (roata2.getNrPane()) {
-        cout << "Acesteia a avut pana de: " << roata2.getNrPane() << " ori \n" << "Panele au fost facute in lunile: ";
-        for (int i = 0; i < roata2.getNrPane(); i++)
-            cout << roata2.getLuniRealizarePana()[i] << " ";
-        cout << "\n \n";
-    }
-    else {
-        cout << "Roata nu a avut pana pana acum.\n \n";
-    }
-
-    //Clasa Navigatie
-    cout << "Sistemul de navigatie conectat prin: " << navigatie2.getTipConectivitate() << " de la marca: " << navigatie2.getMarca() << " ofera indicatii in limba " << navigatie2.getLimba();
-    if (navigatie2.getNumarVoci()) {
-        cout << " are un numar de: " << navigatie2.getNumarVoci() << " voci. Vocile sunt denumite dupa cum urmeaza: ";
-        for (int i = 0; i < navigatie2.getNumarVoci(); i++)
-            cout << navigatie2.getNumeleVocilor()[i] << " ";
-        cout << "\n \n";
-    }
-    else {
-        cout << " Insa nu exista momentan voci instalate.\n \n";
-    }
-
-    // functionalitate set-eri
-    cout << "\nFunctionalitate set-eri: \n";
-    avion2.setMarca("Airbus");
-    avion2.setNrOreZbor(55000);
-    int* anirevizii_3 = new int[5] {1999, 1993, 1994, 2009, 2023};
-    avion2.setAniRevizii(5, anirevizii_3);
-    avion2.setTaraInmatriculare("Bulgaria");
-
-    avion2.afisare();
-
-    roata2.setMaterialPneu("Naylon");
-    roata2.setVarsta(12);
-    string* luni = new string[3]{ "ianuaria", "martie", "mai" };
-    roata2.setLuniRealizarePana(3, luni);
-
-    roata2.afisare();
-
-    navigatie2.setMarca("sygic");
-    navigatie2.setTipConectivitate("Radio");
-    string* numevoci_3 = new string[2]{ "Loredana", "Mihai" };
-    navigatie2.setNumeleVocilor(2, numevoci_3);
-
-    navigatie2.afisare();
-
-    //FAZA 3
-
-    Avion avion4;
-    avion4.afisare();
-    //Operator =
-    avion4 = avion1;
-    avion4.afisare();
-    //operator +
-    avion4 = avion4 + avion4;
-    avion4.afisare();
-    //operator -
-    cout << "operator -" << '\n';
-    cout <<"inainte: "<< avion4.getNrOreZbor() << '\n';
-    avion4 = avion4 - avion1;
-    cout << "dupa: " << avion4.getNrOreZbor() << '\n';
-    //operator==
-    cout << "operator ==" << '\n';
-    cout << "Sunt identice avioanele? ";
-    if (avion4 == avion4) cout << "DA sunt!\n";
-    else cout << "NU sunt!\n";
-
-    cout << "\n \n";
-
-    Roata roata4;
-    roata4.afisare();
-    //Operator =
-    roata4 = roata2;
-    roata4.afisare();
-    //Operator !=
-    cout << "Sunt diferite rotile? ";
-    if (roata4 != roata1) cout << "DA sunt!\n";
-    else cout << "NU sunt!\n";
-    //Operator <
-    cout << "Este prima roata mai noua decat a 2 a? ";
-    if (roata4 < roata1) cout << "DA este!\n";
-    else cout << "NU este!\n";
-    //Operator +=
-    cout << "\n";
-    roata4 += roata3;
-    roata4.afisare();
-
-    cout << "\n \n";
-
-
-    Navigatie navigatie4;
-    navigatie4.afisare();
-    //Operator =
-    navigatie4 = navigatie3;
-    navigatie4.afisare();
-    //Operator <<
-    cout << "Functionalitate operator << \n";
-    cout << navigatie4;
-    //Operator <=
-    cout << "Are prima navigatie un numar de voci mai mic sau egal fata de a doua? ";
-    if (navigatie4 <= navigatie1) cout << "DA are!\n";
-    else cout << "NU are!\n";
-    //Operator >>
-    cout << "Functionalitate operator >> \n";
-    cin >> navigatie4;
-    cout << navigatie4;
-
-
-    //FAZA 4
-
-    //Vector avion
-    int numarElemente = 0;
-    cout << "Introduceti numarul de avioane pe care doriti sa le aveti in vector:";
-    cin >> numarElemente;
-    Avion* vAvion = new Avion[numarElemente];
-    for (int i = 0; i < numarElemente; i++) {
-        cout << "Citire avion " << i + 1 << " :\n";
-        cin >> vAvion[i];
-    }
-
-    for (int i = 0; i < numarElemente; i++) {
-        cout << "Avionul cu numarul " << i + 1 << "\n";
-        vAvion[i].afisare();
-        cout << "\n";
-    }
-
-    //Vector roata
-    numarElemente = 0;
-    cout << "Introduceti numarul de roti pe care doriti sa le aveti in vector:";
-    cin >> numarElemente;
-    Roata* vRoata = new Roata[numarElemente];
-    for (int i = 0; i < numarElemente; i++) {
-        cout << "Citire roata " << i + 1 << " :\n";
-        cin >> vRoata[i];
-    }
-
-    for (int i = 0; i < numarElemente; i++) {
-        cout << "Roata cu numarul " << i + 1 << "\n";
-        vRoata[i].afisare();
-        cout << "\n";
-    }
-
-    //Vector navigatie
-    numarElemente = 0;
-    cout << "Introduceti numarul de navigatii pe care doriti sa le aveti in vector:";
-    cin >> numarElemente;
-    Navigatie* vNavigatie = new Navigatie[numarElemente];
-    for (int i = 0; i < numarElemente; i++) {
-        cout << "Citire navigatia " << i + 1 << " :\n";
-        cin >> vNavigatie[i];
-    }
-
-    for (int i = 0; i < numarElemente; i++) {
-        cout << "Navigatia cu numarul " << i + 1 << "\n";
-        vNavigatie[i].afisare();
-        cout << "\n";
-    }
-
-    //Matricea la alegere (Avioane)
-
-    int linii = 0, coloane = 0;
-    cout << "Introduceti numatul de linii ale matricei: ";
-    cin >> linii;
-    cout << "Introduceti numatul de coloane ale matricei: ";
-    cin >> coloane;
-
-    Avion** mAvion = new Avion * [linii];
-    for (int i = 0; i < linii; i++) {
-        mAvion[i] = new Avion[coloane];
-    }
-
-    for (int i = 0; i < linii; i++) {
-        for (int j = 0; j < coloane; j++) {
-            cout << "Citire avion de pe linia " << i + 1 << " si coloana " << j + 1 << "\n";
-            cin >> mAvion[i][j];
-        }
-    }
-
-    for (int i = 0; i < linii; i++) {
-        for (int j = 0; j < coloane; j++) {
-            cout << "Afisare avion de pe linia " << i + 1 << " si coloana " << j + 1 << "\n";
-            mAvion[i][j].afisare();
-        }
-    }
-
-
-    //Eliberare memorie
-
-    if (linii != 0) {
-        for (int i = 0; i < linii; ++i)
-            delete[] mAvion[i];
-    }
-
-    if (mAvion != nullptr) {
-        delete[] mAvion;
-    }
-
-    if (vAvion != nullptr) {
-        delete[]vAvion;
-    }
-    if (vRoata != nullptr) {
-        delete[]vRoata;
-    }
-    if (vNavigatie != nullptr) {
-        delete[]vNavigatie;
-    }
-
-    //FAZA 5
-
-    Hangar hangar;
-
-    cin >> hangar;
-
-    cout << hangar.getEsteOperational();
-    Hangar hangar2 = hangar;
-    Hangar hangar3;
-    hangar3 = hangar2;
-    cout << hangar;
-    cout << hangar3;
-
-
+    Navigatie navigatie12, navigatie13;
+    cin >> navigatie12;
+    navigatie12.writeB("navigatii.bin");
+    navigatie13.readB("navigatii.bin");
+    navigatie13.afisare();
     return 0;
 }
