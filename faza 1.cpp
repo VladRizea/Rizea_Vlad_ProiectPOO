@@ -724,7 +724,7 @@ public:
     Hangar(const Hangar& hangar) {
         this->esteOperational = hangar.esteOperational;
         this->suprafata = hangar.suprafata;
-        this->numarAvioane = 0;
+        this->numarAvioane = hangar.numarAvioane;
         this->avioane = new Avion[numarAvioane];
         for (int i = 0; i < this->numarAvioane; i++) {
             this->avioane[i] = hangar.avioane[i];
@@ -775,7 +775,9 @@ public:
         out << "Hangar este " << (hangar.esteOperational ? "operational." : "neoperational.") << endl;
         out << "Suprafata hangarului: " << hangar.suprafata << " metri patrati." << endl;
         out << "Numarul actual de avioane: " << hangar.numarAvioane << endl;
-        out << "Avioanele din hangar:" << endl;
+        if (hangar.numarAvioane) { 
+            out << "Avioanele din hangar:" << endl; 
+        }
         for (int i = 0; i < hangar.numarAvioane; i++) {
             hangar.avioane[i].afisare();
         }
@@ -786,6 +788,153 @@ public:
 
 };
 
+
+class AvionPasageri :public Avion {
+private:
+    int numarLocuri;
+    string companieAeriana;
+
+public:
+    // GET si SET
+
+
+    int getNumarLocuri() const {
+        return this->numarLocuri;
+    }
+
+    void setNumarLocuri(int nr) {
+        this->numarLocuri = nr;
+    }
+
+    string getCompanieAeriana() const {
+        return this->companieAeriana;
+    }
+
+    void setCompanieAeriana(string companie) {
+        this->companieAeriana = companie;
+    }
+    //METODE
+
+    void afisareAvionPasageri() {
+        (*this).afisare();
+        cout << "Avionul de pasageri are " << this->numarLocuri << " locuri si este operat de: " << this->companieAeriana;
+    }
+
+    //SUPRAINCARCARE OPERATORI
+
+    AvionPasageri operator=(const AvionPasageri &ap){
+        if (this != &ap) {
+            Avion::operator=(ap);
+            this->numarLocuri = ap.numarLocuri;
+            this->companieAeriana = ap.companieAeriana;
+        }
+        return *this;
+    }
+
+    //CONSTRUCTORI
+
+    AvionPasageri() : Avion("AIRBUS",9000) {
+        this->numarLocuri = 80;
+        this->companieAeriana = "Tarom";
+    }
+
+    AvionPasageri(int numarLocuri, string campaniaAeriana, string serie, string marca, int nrOreZbor, int nrRevizii, int* aniRevizii) : Avion(serie, marca, nrOreZbor, nrRevizii, aniRevizii) {
+        this->numarLocuri = numarLocuri;
+        this->companieAeriana = campaniaAeriana;
+    }
+
+    AvionPasageri(const AvionPasageri& ap) : Avion(ap) {
+        this->numarLocuri = ap.numarLocuri;
+        this->companieAeriana = ap.companieAeriana;
+    }
+
+    ~AvionPasageri() {
+    }
+
+
+};
+
+class HangarMilitar :public Hangar {
+private:
+    bool reteaSecurizata;
+    string certificareMilitara;
+
+public:
+    // GET si SET
+
+
+    bool getReteaSecurizata() const {
+        return this->reteaSecurizata;
+    }
+
+    void setReteaSecurizata(bool nr) {
+        this->reteaSecurizata = nr;
+    }
+
+    string getCertificareMilitara() const {
+        return this->certificareMilitara;
+    }
+
+    void setCertificareMilitara(string companie) {
+        this->certificareMilitara = companie;
+    }
+
+
+
+    //CONSTRUCTORI
+
+    HangarMilitar() : Hangar() {
+        this->reteaSecurizata = 1;
+        this->certificareMilitara = "ISO 9001";
+    }
+
+    HangarMilitar(bool reteaSecurizata, string certificareMilitara, bool esteOperational, int suprafata, int numarAvioane, Avion* avioane) : Hangar(esteOperational, suprafata, numarAvioane, avioane) {
+        this->reteaSecurizata = reteaSecurizata;
+        this->certificareMilitara = certificareMilitara;
+    }
+
+    HangarMilitar(const HangarMilitar& hangarMil) : Hangar(hangarMil) {
+        this->reteaSecurizata = hangarMil.reteaSecurizata;
+        this->certificareMilitara = hangarMil.certificareMilitara;
+    }
+
+    ~HangarMilitar() {
+    }
+
+    //SUPRAINCARCARE OPERATORI
+
+    HangarMilitar operator=(const HangarMilitar& hangarMil) {
+        if (this != &hangarMil) {
+            Hangar::operator=(hangarMil);
+            this->reteaSecurizata = hangarMil.reteaSecurizata;
+            this->certificareMilitara = hangarMil.certificareMilitara;
+        }
+        return *this;
+    }
+
+    friend istream& operator>>(istream& in, HangarMilitar& hangarMil) {
+        in >> (Hangar&)hangarMil;
+        cout << "Este securizata reteaua?(1-da, 0-nu):";
+        in >> hangarMil.reteaSecurizata;
+        cout << "Certificarea militara a hangarului?:";
+        in >> hangarMil.certificareMilitara;
+        cout<<"\n";
+        return in;
+    }
+
+    friend ostream& operator<<(ostream& out, const HangarMilitar& hangarMil) {
+        out << (Hangar)hangarMil;
+        if (hangarMil.reteaSecurizata) {
+            out << "Reteaua este securizata ";
+        }
+        else
+            out << "Reteaua nu este securizata ";
+            out << "Certificarea militara este: " << hangarMil.certificareMilitara;
+        return out;
+    }
+
+
+};
 
 //SUPRAINCARCARE OPERATORI
 ostream& operator<<(ostream& out, Navigatie nav) {
@@ -1208,44 +1357,81 @@ int main() {
     //cout << hangar;
     //cout << hangar3;
 
-    //FAZA 6
-    //prima clas txt
-    ofstream aviOut("avioane.txt", ios::out);
-    Avion avion10;
-    cin >> avion10;
-    aviOut << avion10;
-    aviOut.close();
-    ifstream aviIn("avioane.txt", ios::in);
-    Avion avion11;
-    aviIn >> avion11;
-    avion11.afisare();
-    aviIn.close();
-    //a doua clasa txt
-    ofstream navOut("roti.txt", ios::out);
-    Navigatie navigatie10;
-    cin >> navigatie10;
-    navOut << navigatie10;
-    navOut.close();
-    ifstream navIn("roti.txt", ios::in);
-    Navigatie navigatie11;
-    navIn >> navigatie11;
-    navigatie11.afisare();
-    navIn.close();
+    ////FAZA 6
+    ////prima clas txt
+    //ofstream aviOut("avioane.txt", ios::out);
+    //Avion avion10;
+    //cin >> avion10;
+    //aviOut << avion10;
+    //aviOut.close();
+    //ifstream aviIn("avioane.txt", ios::in);
+    //Avion avion11;
+    //aviIn >> avion11;
+    //avion11.afisare();
+    //aviIn.close();
+    ////a doua clasa txt
+    //ofstream navOut("roti.txt", ios::out);
+    //Navigatie navigatie10;
+    //cin >> navigatie10;
+    //navOut << navigatie10;
+    //navOut.close();
+    //ifstream navIn("roti.txt", ios::in);
+    //Navigatie navigatie11;
+    //navIn >> navigatie11;
+    //navigatie11.afisare();
+    //navIn.close();
 
-    //prima clasa fisier binar
-    
-    Avion avion12, avion13;
-    cin >> avion12;
-    avion12.writeB("avioane.bin");
-    avion13.readB("avioane.bin");
-    avion13.afisare();
+    ////prima clasa fisier binar
+    //
+    //Avion avion12, avion13;
+    //cin >> avion12;
+    //avion12.writeB("avioane.bin");
+    //avion13.readB("avioane.bin");
+    //avion13.afisare();
 
-    //a doua clasa fisier binar
+    ////a doua clasa fisier binar
 
-    Navigatie navigatie12, navigatie13;
-    cin >> navigatie12;
-    navigatie12.writeB("navigatii.bin");
-    navigatie13.readB("navigatii.bin");
-    navigatie13.afisare();
+    //Navigatie navigatie12, navigatie13;
+    //cin >> navigatie12;
+    //navigatie12.writeB("navigatii.bin");
+    //navigatie13.readB("navigatii.bin");
+    //navigatie13.afisare();
+
+    //FAZA 7
+
+    //Prima clasa de tipul "is-a"
+    AvionPasageri avionpas1;
+    avionpas1.afisareAvionPasageri();
+    int aniRviziiAvionPasageri[2]{ 1990, 1991 };
+    AvionPasageri avionpas2(66, "Ryanair", "134DD", "Boeing", 3993, 2, aniRviziiAvionPasageri);
+    avionpas2.afisareAvionPasageri();
+    AvionPasageri avionpas3 = avionpas2;
+    avionpas3.afisareAvionPasageri();
+    avionpas3 = avionpas1;
+    avionpas3.afisareAvionPasageri();
+    cout << "testare Get si Set (inainte):" << avionpas2.getNumarLocuri() << " " << avionpas2.getCompanieAeriana()<<"\n";
+    avionpas2.setNumarLocuri(99);
+    avionpas2.setCompanieAeriana("KLM");
+    cout << "testare Get si Set (dupa):" << avionpas2.getNumarLocuri() << " " << avionpas2.getCompanieAeriana() << "\n";
+
+    //A doua calsa de tipul "is-a"
+
+    HangarMilitar hangarMil1;
+    cin >> hangarMil1;
+    cout << hangarMil1;
+    HangarMilitar hangarMil2 = hangarMil1;
+    cout << hangarMil2;
+    HangarMilitar hangarMil3;
+    hangarMil2 = hangarMil3;
+    cout << hangarMil2;
+
+    cout << "\ntestare Get si Set (inainte):" << hangarMil1.getEsteOperational() << " " << hangarMil1.getCertificareMilitara() << "\n";
+    hangarMil1.setReteaSecurizata(0);
+    hangarMil1.setCertificareMilitara("MIL-STD");
+    cout << "testare Get si Set (dupa):" << hangarMil1.getEsteOperational() << " " << hangarMil1.getCertificareMilitara() << "\n";
+
+
+
+
     return 0;
 }
