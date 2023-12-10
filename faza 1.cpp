@@ -9,7 +9,18 @@ using namespace std;
 class Roata;
 class Navigatie;
 
-class Avion {
+class Abstract1 {
+public:
+    virtual void printObject1() = 0;
+};
+
+class Abstract2 {
+public:
+    virtual void printObject2() = 0;
+};
+
+
+class Avion : public Abstract1, public Abstract2 {
 private:
     const string serie;
     static string taraInmatriculare;
@@ -72,6 +83,12 @@ public:
 
     //METODE
 
+    void printObject1() {
+        cout << "Avionul cu seria de sasiu: " << this->serie << " de marca: " << this->marca << " inmatriculat in tara: " << this->taraInmatriculare << " are un numar de: " << this->nrOreZbor << " ore de zbor. ";
+    }
+    void printObject2() {
+        cout<< "Abstract 2 " << "Avionul cu seria de sasiu: " << this->serie << " de marca: " << this->marca << " inmatriculat in tara: " << this->taraInmatriculare << " are un numar de: " << this->nrOreZbor << " ore de zbor. ";
+    }
     void afisare() {
         cout << "Avionul cu seria de sasiu: " << this->serie << " de marca: " << this->marca << " inmatriculat in tara: " << this->taraInmatriculare << " are un numar de: " << this->nrOreZbor << " ore de zbor. ";
             
@@ -257,7 +274,7 @@ public:
 string Avion::taraInmatriculare = "Romania";
 
 
-class Roata {
+class Roata : public Abstract1, public Abstract2 {
 private:
     const string pozitie;
     static string materialPneu;
@@ -310,6 +327,13 @@ public:
     }
 
     //METODE
+    void printObject1() {
+        cout << "Roata pozitionata: " << this->pozitie << " cu pneul fabricat din: " << this->materialPneu << " are o varsta de: " << this->varsta << " ani. ";
+    }
+
+    void printObject2() {
+        cout << "Abstract 2 " << "Roata pozitionata: " << this->pozitie << " cu pneul fabricat din: " << this->materialPneu << " are o varsta de: " << this->varsta << " ani. ";
+    }
 
     void afisare() {
         cout << "Roata pozitionata: " << this->pozitie << " cu pneul fabricat din: " << this->materialPneu << " are o varsta de: " << this->varsta << " ani. ";
@@ -424,7 +448,7 @@ public:
 string Roata::materialPneu = "Cauciuc";
 
 
-class Navigatie {
+class Navigatie :public Abstract1, public Abstract2{
 private:
     const string limba;
     static string tipConectivitate;
@@ -480,6 +504,12 @@ public:
         }
     }
     //METODE
+    void printObject1() {
+        cout << "Sistemul de navigatie conectat prin: " << this->tipConectivitate << " de la marca: " << this->marca << " ofera indicatii in limba " << this->limba;
+    }
+    void printObject2() {
+        cout <<"Abstract 2 "<< "Sistemul de navigatie conectat prin: " << this->tipConectivitate << " de la marca: " << this->marca << " ofera indicatii in limba " << this->limba;
+    }
 
     void afisare() {
         cout << "Sistemul de navigatie conectat prin: " << this->tipConectivitate << " de la marca: " << this->marca << " ofera indicatii in limba " << this->limba;
@@ -664,6 +694,133 @@ public:
 
 string Navigatie::tipConectivitate = "Satelit";
 
+class HangarAbstract {
+private:
+    bool esteOperational;
+    int suprafata;
+    int numarObiecte;
+    Abstract1** obiecteAbstracte;
+
+public:
+    bool getEsteOperational() const {
+        return this->esteOperational;
+    }
+
+    void setEsteOperational(bool este) {
+        this->esteOperational = este;
+    }
+
+    int getSuprafata() const {
+        return this->suprafata;
+    }
+
+    void setSuprafata(int numar) {
+        this->suprafata = numar;
+    }
+
+    int getNumarObiecte() const {
+        return this->numarObiecte;
+    }
+
+    Abstract1** getObiecteAbstracte() {
+        return this->obiecteAbstracte;
+    }
+
+    void setNumarObiecte(int numar) {
+        numarObiecte = numar;
+        if (this->obiecteAbstracte != nullptr) {
+            delete[]obiecteAbstracte;
+        }
+        this->obiecteAbstracte = new Abstract1 * [numarObiecte];
+
+        for (int i = 0; i < this->numarObiecte; i++)
+            this->obiecteAbstracte[i] = new Avion();
+    }
+
+    HangarAbstract() : esteOperational(true), suprafata(100), numarObiecte(0), obiecteAbstracte(nullptr) {}
+
+    HangarAbstract(bool esteOperational, int suprafata, int numarObiecte, Abstract1** obiecteAbstracte) {
+        this->esteOperational = esteOperational;
+        this->suprafata = suprafata;
+        this->numarObiecte = numarObiecte;
+        this->obiecteAbstracte = new Abstract1 * [numarObiecte];
+
+        for (int i = 0; i < this->numarObiecte; i++) {
+            this->obiecteAbstracte[i] = obiecteAbstracte[i];
+        }
+    }
+
+    HangarAbstract(const HangarAbstract& hangar) {
+        this->esteOperational = hangar.esteOperational;
+        this->suprafata = hangar.suprafata;
+        this->numarObiecte = hangar.numarObiecte;
+        this->obiecteAbstracte = new Abstract1 * [numarObiecte];
+
+        for (int i = 0; i < this->numarObiecte; i++) {
+            this->obiecteAbstracte[i] = hangar.obiecteAbstracte[i];
+        }
+    }
+
+    ~HangarAbstract() {
+        delete[] obiecteAbstracte;
+    }
+
+    HangarAbstract& operator=(const HangarAbstract& hangar) {
+        if (this != &hangar) {
+            this->esteOperational = hangar.esteOperational;
+            this->suprafata = hangar.suprafata;
+            this->numarObiecte = hangar.numarObiecte;
+            if (obiecteAbstracte != nullptr) {
+                delete[]this->obiecteAbstracte;
+            }
+            obiecteAbstracte = new Abstract1 * [this->numarObiecte];
+            for (int i = 0; i < hangar.numarObiecte; ++i) {
+                obiecteAbstracte[i] = hangar.obiecteAbstracte[i];
+            }
+        }
+        return *this;
+    }
+
+    friend istream& operator>>(istream& in, HangarAbstract& hangar) {
+        cout << "\nEste operational? (1 da, 0 nu)";
+        in >> hangar.esteOperational;
+        cout << "\nSuprafata: ";
+        in >> hangar.suprafata;
+        cout << "\nNumar obiecte: ";
+        in >> hangar.numarObiecte;
+        hangar.obiecteAbstracte = new Abstract1 * [hangar.numarObiecte];
+        cout << "\nCitire obiecte: ";
+        for (int i = 0; i < hangar.numarObiecte; ++i) {
+            hangar.obiecteAbstracte[i] = new Avion();
+        }
+        cout << "\n";
+        return in;
+    }
+
+    friend ostream& operator<<(ostream& out, const HangarAbstract& hangar) {
+        out << "Hangar este " << (hangar.esteOperational ? "operational." : "neoperational.") << endl;
+        out << "Suprafata hangarului: " << hangar.suprafata << " metri patrati." << endl;
+        out << "Numarul actual de obiecte: " << hangar.numarObiecte << endl;
+        if (hangar.numarObiecte) {
+            out << "Obiectele din hangar:" << endl;
+        }
+        for (int i = 0; i < hangar.numarObiecte; i++) {
+            hangar.obiecteAbstracte[i]->printObject1();
+            cout << "\n";
+        }
+        return out;
+    }
+
+    Abstract1*& operator[](int index) {
+        if (index >= 0 && index < numarObiecte) {
+            return obiecteAbstracte[index];
+        }
+        else {
+            throw 404;
+        }
+    }
+};
+
 
 class Hangar {
 private:
@@ -671,6 +828,7 @@ private:
     int suprafata;
     int numarAvioane;
     Avion* avioane;
+    
 public:
     //get si set
 
@@ -711,6 +869,7 @@ public:
     //constructori
     Hangar(): esteOperational(1), suprafata(100), numarAvioane(0), avioane(nullptr) {
     }
+
     Hangar(bool esteOperational, int suprafata, int numarAvioane, Avion* avioane) {
         this->esteOperational = esteOperational;
         this->suprafata = suprafata;
@@ -1397,40 +1556,85 @@ int main() {
     //navigatie13.readB("navigatii.bin");
     //navigatie13.afisare();
 
-    //FAZA 7
+    ////FAZA 7
 
-    //Prima clasa de tipul "is-a"
-    AvionPasageri avionpas1;
-    avionpas1.afisareAvionPasageri();
-    int aniRviziiAvionPasageri[2]{ 1990, 1991 };
-    AvionPasageri avionpas2(66, "Ryanair", "134DD", "Boeing", 3993, 2, aniRviziiAvionPasageri);
-    avionpas2.afisareAvionPasageri();
-    AvionPasageri avionpas3 = avionpas2;
-    avionpas3.afisareAvionPasageri();
-    avionpas3 = avionpas1;
-    avionpas3.afisareAvionPasageri();
-    cout << "testare Get si Set (inainte):" << avionpas2.getNumarLocuri() << " " << avionpas2.getCompanieAeriana()<<"\n";
-    avionpas2.setNumarLocuri(99);
-    avionpas2.setCompanieAeriana("KLM");
-    cout << "testare Get si Set (dupa):" << avionpas2.getNumarLocuri() << " " << avionpas2.getCompanieAeriana() << "\n";
+    ////Prima clasa de tipul "is-a"
+    //AvionPasageri avionpas1;
+    //avionpas1.afisareAvionPasageri();
+    //int aniRviziiAvionPasageri[2]{ 1990, 1991 };
+    //AvionPasageri avionpas2(66, "Ryanair", "134DD", "Boeing", 3993, 2, aniRviziiAvionPasageri);
+    //avionpas2.afisareAvionPasageri();
+    //AvionPasageri avionpas3 = avionpas2;
+    //avionpas3.afisareAvionPasageri();
+    //avionpas3 = avionpas1;
+    //avionpas3.afisareAvionPasageri();
+    //cout << "testare Get si Set (inainte):" << avionpas2.getNumarLocuri() << " " << avionpas2.getCompanieAeriana()<<"\n";
+    //avionpas2.setNumarLocuri(99);
+    //avionpas2.setCompanieAeriana("KLM");
+    //cout << "testare Get si Set (dupa):" << avionpas2.getNumarLocuri() << " " << avionpas2.getCompanieAeriana() << "\n";
 
-    //A doua calsa de tipul "is-a"
+    ////A doua calsa de tipul "is-a"
 
-    HangarMilitar hangarMil1;
-    cin >> hangarMil1;
-    cout << hangarMil1;
-    HangarMilitar hangarMil2 = hangarMil1;
-    cout << hangarMil2;
-    HangarMilitar hangarMil3;
-    hangarMil2 = hangarMil3;
-    cout << hangarMil2;
+    //HangarMilitar hangarMil1;
+    //cin >> hangarMil1;
+    //cout << hangarMil1;
+    //HangarMilitar hangarMil2 = hangarMil1;
+    //cout << hangarMil2;
+    //HangarMilitar hangarMil3;
+    //hangarMil2 = hangarMil3;
+    //cout << hangarMil2;
 
-    cout << "\ntestare Get si Set (inainte):" << hangarMil1.getEsteOperational() << " " << hangarMil1.getCertificareMilitara() << "\n";
-    hangarMil1.setReteaSecurizata(0);
-    hangarMil1.setCertificareMilitara("MIL-STD");
-    cout << "testare Get si Set (dupa):" << hangarMil1.getEsteOperational() << " " << hangarMil1.getCertificareMilitara() << "\n";
+    //cout << "\ntestare Get si Set (inainte):" << hangarMil1.getEsteOperational() << " " << hangarMil1.getCertificareMilitara() << "\n";
+    //hangarMil1.setReteaSecurizata(0);
+    //hangarMil1.setCertificareMilitara("MIL-STD");
+    //cout << "testare Get si Set (dupa):" << hangarMil1.getEsteOperational() << " " << hangarMil1.getCertificareMilitara() << "\n";
+
+    //FAZA 8
+
+    Abstract1** vectorAbstract = new Abstract1*[10];
+    vectorAbstract[0] = new Avion();
+    vectorAbstract[1] = new Roata();
+    vectorAbstract[2] = new Navigatie();
+    vectorAbstract[3] = new Roata();
+    vectorAbstract[4] = new Navigatie();
+    vectorAbstract[5] = new Avion();
+    vectorAbstract[6] = new Roata();
+    vectorAbstract[7] = new Avion();
+    vectorAbstract[8] = new Navigatie();
+    vectorAbstract[9] = new Roata();
 
 
+    for (int i = 0; i < 10; i++) {
+        vectorAbstract[i]->printObject1();
+        cout << "\n";
+    }
+    cout << "\n\n";
+    Abstract2** vectorAbstract2 = new Abstract2 * [10];
+    vectorAbstract2[0] = new Avion();
+    vectorAbstract2[1] = new Navigatie();
+    vectorAbstract2[2] = new Roata();
+    vectorAbstract2[3] = new Roata();
+    vectorAbstract2[4] = new Avion();
+    vectorAbstract2[5] = new Avion();
+    vectorAbstract2[6] = new Navigatie();
+    vectorAbstract2[7] = new Avion();
+    vectorAbstract2[8] = new Navigatie();
+    vectorAbstract2[9] = new Roata();
+
+
+    for (int i = 0; i < 10; i++) {
+        vectorAbstract2[i]->printObject2();
+        cout << "\n";
+    }
+
+    cout << "\n\n";
+    HangarAbstract hangarAbstract;
+    hangarAbstract.setNumarObiecte(3);
+    hangarAbstract[0] = new Avion();
+    hangarAbstract[1] = new Navigatie();
+    hangarAbstract[2] = new Roata();
+
+    cout << hangarAbstract;
 
 
     return 0;
